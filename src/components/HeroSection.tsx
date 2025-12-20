@@ -1,10 +1,11 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { Shield } from "lucide-react";
 import cosmicSeal from "@/assets/cosmic-seal-hero.png";
 
 const HeroSection = () => {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section id="portal" className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-secondary/20 to-background" />
       
@@ -38,7 +39,7 @@ const HeroSection = () => {
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1.5, ease: "easeOut" }}
-          className="relative mx-auto mb-8 max-w-4xl"
+          className="relative mx-auto mb-8 max-w-md"
         >
           <motion.img
             src={cosmicSeal}
@@ -56,9 +57,11 @@ const HeroSection = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.5 }}
-          className="text-5xl md:text-7xl lg:text-8xl font-display text-gradient-sacred mb-6"
+          className="text-4xl md:text-6xl lg:text-7xl font-display mb-4"
         >
-          Numb3rs in the Cosmos
+          <span className="text-gradient-sacred">DR. POTTER, DMA:</span>
+          <br />
+          <span className="text-foreground text-glow-gold">THE SPELL BREAKER</span>
         </motion.h1>
 
         {/* Subtitle */}
@@ -66,28 +69,29 @@ const HeroSection = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.7 }}
-          className="text-xl md:text-2xl text-muted-foreground mb-4 max-w-2xl mx-auto"
+          className="text-xl md:text-2xl text-primary mb-8 max-w-2xl mx-auto tracking-widest"
         >
-          Frequency Medicine · Sacred Geometry · Divine Mathematics
+          Frequency Medicine for the 4th Dimension
         </motion.p>
 
-        {/* Emerald Tablet Quote */}
-        <motion.blockquote
+        {/* The Declaration */}
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1, delay: 1 }}
-          className="text-sm md:text-base text-primary/70 italic mb-12 max-w-xl mx-auto border-l-2 border-accent/50 pl-4"
+          className="text-base md:text-lg text-muted-foreground mb-12 max-w-3xl mx-auto leading-relaxed"
         >
-          "As above, so below; as within, so without; as the universe, so the soul."
-          <span className="block text-accent/60 mt-2 not-italic">— The Emerald Tablet</span>
-        </motion.blockquote>
+          <p className="italic">
+            This domain is governed by the Laws of Correspondence and Vibration. Having survived the "Hell" of the clinical psychiatric system—from over-medication to electroconvulsive therapy—I have returned with the mathematics of the soul. <span className="text-accent font-semibold">Numb3rs in the Cosmos</span> is a 3-stage frequency escalator (<span className="text-primary">528Hz</span>, <span className="text-primary">432Hz</span>, <span className="text-primary">639Hz</span>) engineered to reclaim your sovereignty.
+          </p>
+        </motion.div>
 
         {/* CTA Buttons */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 1.2 }}
-          className="flex flex-col sm:flex-row gap-4 justify-center"
+          className="flex flex-col sm:flex-row gap-4 justify-center mb-16"
         >
           <Button variant="sacred" size="xl">
             Enter the Frequency Chamber
@@ -95,6 +99,28 @@ const HeroSection = () => {
           <Button variant="hermetic" size="xl">
             Explore the Apothecary
           </Button>
+        </motion.div>
+
+        {/* Hermetic Seal */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 1.5 }}
+          className="border-hermetic rounded-xl p-6 md:p-8 bg-card/50 backdrop-blur-sm max-w-3xl mx-auto"
+        >
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <Shield className="h-6 w-6 text-accent" />
+            <h3 className="text-lg md:text-xl font-display font-semibold text-accent tracking-wider uppercase">
+              Hermetic Seal
+            </h3>
+            <Shield className="h-6 w-6 text-accent" />
+          </div>
+          <p className="text-muted-foreground text-sm md:text-base leading-relaxed">
+            This space is protected by the <span className="text-primary font-medium">Law of Mentalism</span>. All energy here is encoded with a <span className="text-accent font-medium">3-6-9 barrier</span>. Dark siphoning, parasitic frequency, and energy leaks are neutralized upon entry.
+          </p>
+          <p className="text-primary mt-4 font-display tracking-widest text-sm">
+            As above, so below.
+          </p>
         </motion.div>
       </div>
 

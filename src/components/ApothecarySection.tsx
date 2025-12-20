@@ -1,54 +1,58 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { Download, Disc, Gem, Shirt, ShoppingBag } from "lucide-react";
 
-const products = [
+const losslessArchive = [
   {
-    category: "LOSSLESS VINYL",
-    name: "Infinity Sign",
-    description: "180g heavy-weight pressing, 432Hz mastered",
-    price: "$49.99",
-    crystal: "Lapis Lazuli",
-    image: "https://images.unsplash.com/photo-1539375665275-f9de415ef9ac?w=400&h=400&fit=crop",
+    id: 1,
+    name: "The Trinity Digital Bundle",
+    description: "24-bit High-Fidelity WAV files. Uncompressed for biological efficacy.",
+    frequency: "528Hz • 432Hz • 639Hz",
+    icon: Download,
+    price: "$33.33",
   },
   {
-    category: "LOSSLESS VINYL",
-    name: "Cosmic Resonance",
-    description: "Limited edition holographic sleeve, 528Hz",
-    price: "$59.99",
-    crystal: "Amethyst",
-    image: "https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=400&h=400&fit=crop",
+    id: 2,
+    name: "180g Infinity Vinyl",
+    description: 'The physical weight of frequency. Includes a limited-edition "Vortex Math" lyric insert.',
+    frequency: "Analog Warmth",
+    icon: Disc,
+    price: "$66.66",
+  },
+];
+
+const toolkit = [
+  {
+    id: 3,
+    name: "Lapis Lazuli",
+    description: "Charged at 528Hz during the Numb3rs master sessions. Enhances truth and inner wisdom.",
+    frequency: "528Hz Charged",
+    icon: Gem,
+    color: "primary",
   },
   {
-    category: "FREQUENCY ROCKS",
-    name: "Lapis Lazuli Cluster",
-    description: "Charged with Infinity Sign frequencies",
-    price: "$89.99",
-    frequency: "432 Hz",
-    image: "https://images.unsplash.com/photo-1610482899309-9b49afb4e695?w=400&h=400&fit=crop",
+    id: 4,
+    name: "Selenite",
+    description: "Charged at 528Hz during the Numb3rs master sessions. Clears energy blockages and amplifies frequency.",
+    frequency: "528Hz Charged",
+    icon: Gem,
+    color: "foreground",
   },
   {
-    category: "FREQUENCY ROCKS",
-    name: "Amethyst Crown",
-    description: "Third eye activation, dream enhancement",
-    price: "$129.99",
-    frequency: "852 Hz",
-    image: "https://images.unsplash.com/photo-1509644851169-2acc08aa25b5?w=400&h=400&fit=crop",
+    id: 5,
+    name: "Black Tourmaline",
+    description: "Charged at 528Hz during the Numb3rs master sessions. Protection against negative frequencies.",
+    frequency: "528Hz Charged",
+    icon: Gem,
+    color: "muted-foreground",
   },
   {
-    category: "FREQUENCY ROCKS",
-    name: "Clear Quartz Tower",
-    description: "Master healer, amplifies all frequencies",
-    price: "$149.99",
-    frequency: "963 Hz",
-    image: "https://images.unsplash.com/photo-1551650975-87deedd944c3?w=400&h=400&fit=crop",
-  },
-  {
-    category: "LOSSLESS VINYL",
-    name: "Divine Geometry",
-    description: "Triple gatefold, sacred geometry artwork",
-    price: "$79.99",
-    crystal: "Rose Quartz",
-    image: "https://images.unsplash.com/photo-1574169208507-84376144848b?w=400&h=400&fit=crop",
+    id: 6,
+    name: "The 3-6-9 Raiment",
+    description: "Protective clothing featuring the Sigil of Hermes to shield the wearer's aura from external frequency interference.",
+    frequency: "Sacred Protection",
+    icon: Shirt,
+    color: "accent",
   },
 ];
 
@@ -71,79 +75,106 @@ const ApothecarySection = () => {
             The Apothecary
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Sacred artifacts imbued with healing frequencies. Each item is 
-            ceremonially charged and tuned to specific vibrational patterns.
+            Merch & Media engineered for frequency healing
           </p>
         </motion.div>
 
-        {/* Product Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {products.map((product, index) => (
-            <motion.div
-              key={product.name}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-              viewport={{ once: true }}
-              className="group"
-            >
-              <div className="border-hermetic rounded-lg overflow-hidden bg-card/30 backdrop-blur-sm hover:shadow-sacred transition-all duration-500">
-                {/* Product Image */}
-                <div className="relative overflow-hidden aspect-square">
-                  <motion.img
-                    src={product.image}
-                    alt={product.name}
-                    className="w-full h-full object-cover"
-                    whileHover={{ scale: 1.1 }}
-                    transition={{ duration: 0.6 }}
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
-                  
-                  {/* Category Badge */}
-                  <span className="absolute top-4 left-4 px-3 py-1 bg-secondary/80 backdrop-blur-sm rounded-full text-xs font-medium text-secondary-foreground tracking-wider">
-                    {product.category}
-                  </span>
-                </div>
-
-                {/* Product Info */}
-                <div className="p-6">
-                  <h3 className="text-xl font-display text-foreground mb-2 group-hover:text-primary transition-colors">
-                    {product.name}
-                  </h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    {product.description}
-                  </p>
-
-                  {/* Metadata */}
-                  <div className="flex items-center gap-4 mb-4 text-xs text-muted-foreground">
-                    {product.crystal && (
-                      <span className="flex items-center gap-1">
-                        <span className="w-2 h-2 rounded-full bg-accent" />
-                        {product.crystal}
-                      </span>
-                    )}
-                    {product.frequency && (
-                      <span className="flex items-center gap-1">
-                        <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                        {product.frequency}
-                      </span>
-                    )}
+        {/* The Lossless Archive */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          viewport={{ once: true }}
+          className="mb-20"
+        >
+          <h3 className="text-2xl md:text-3xl font-display text-accent text-center mb-10 tracking-wider">
+            The Lossless Archive
+          </h3>
+          
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {losslessArchive.map((item, index) => (
+              <motion.div
+                key={item.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.1 * index }}
+                whileHover={{ scale: 1.02, y: -5 }}
+                className="group border-hermetic rounded-xl p-8 bg-card/50 backdrop-blur-sm hover:bg-card/80 transition-all duration-300"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="p-3 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                    <item.icon className="h-8 w-8 text-primary" />
                   </div>
-
-                  {/* Price & CTA */}
-                  <div className="flex items-center justify-between">
-                    <span className="text-2xl font-display text-accent text-glow-gold">
-                      {product.price}
-                    </span>
-                    <Button variant="outline" size="sm">
-                      Add to Cart
-                    </Button>
+                  <div className="flex-1">
+                    <h4 className="text-xl font-display text-foreground mb-2">{item.name}</h4>
+                    <p className="text-muted-foreground text-sm mb-3">{item.description}</p>
+                    <span className="text-primary text-xs font-medium tracking-wider">{item.frequency}</span>
                   </div>
                 </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+                <div className="flex items-center justify-between mt-6 pt-4 border-t border-border/50">
+                  <span className="text-2xl font-display text-accent text-glow-gold">{item.price}</span>
+                  <Button variant="gold" size="sm">
+                    <ShoppingBag className="mr-2 h-4 w-4" />
+                    Add to Cart
+                  </Button>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* The Tool Kit */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          viewport={{ once: true }}
+        >
+          <h3 className="text-2xl md:text-3xl font-display text-accent text-center mb-10 tracking-wider">
+            The Tool Kit
+          </h3>
+          
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {toolkit.map((item, index) => (
+              <motion.div
+                key={item.id}
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.1 * index }}
+                whileHover={{ scale: 1.05, y: -10 }}
+                className="group border-hermetic rounded-xl p-6 bg-card/50 backdrop-blur-sm hover:bg-card/80 transition-all duration-300 text-center"
+              >
+                <div className={`
+                  w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center
+                  ${item.color === 'primary' ? 'bg-primary/20 text-primary' : ''}
+                  ${item.color === 'foreground' ? 'bg-foreground/10 text-foreground' : ''}
+                  ${item.color === 'muted-foreground' ? 'bg-muted text-muted-foreground' : ''}
+                  ${item.color === 'accent' ? 'bg-accent/20 text-accent' : ''}
+                  group-hover:scale-110 transition-transform duration-300
+                `}>
+                  <item.icon className="h-8 w-8" />
+                </div>
+                <h4 className="text-lg font-display text-foreground mb-2">{item.name}</h4>
+                <p className="text-muted-foreground text-sm mb-3">{item.description}</p>
+                <span className={`
+                  text-xs font-medium tracking-wider
+                  ${item.color === 'primary' ? 'text-primary' : ''}
+                  ${item.color === 'foreground' ? 'text-foreground' : ''}
+                  ${item.color === 'muted-foreground' ? 'text-muted-foreground' : ''}
+                  ${item.color === 'accent' ? 'text-accent' : ''}
+                `}>
+                  {item.frequency}
+                </span>
+                <Button variant="hermetic" size="sm" className="w-full mt-4">
+                  <ShoppingBag className="mr-2 h-4 w-4" />
+                  Select
+                </Button>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
       </div>
     </section>
   );

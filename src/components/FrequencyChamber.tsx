@@ -1,15 +1,34 @@
 import { useState, useRef } from "react";
 import { motion } from "framer-motion";
-import { Play, Pause, SkipBack, SkipForward, Volume2 } from "lucide-react";
+import { Play, Pause, SkipBack, SkipForward, Volume2, Hexagon, Flower, Circle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 
 const tracks = [
-  { id: 1, title: "Infinity Sign", frequency: "432 Hz", duration: "4:32" },
-  { id: 2, title: "Cosmic Resonance", frequency: "528 Hz", duration: "5:18" },
-  { id: 3, title: "Divine Mathematics", frequency: "639 Hz", duration: "6:07" },
-  { id: 4, title: "Sacred Spiral", frequency: "741 Hz", duration: "4:55" },
-  { id: 5, title: "Void Walker", frequency: "852 Hz", duration: "7:23" },
+  { 
+    id: 1, 
+    title: "The Spell Breaker", 
+    frequency: "528Hz", 
+    duration: "4:32",
+    visualization: "Hexagonal structure of 528Hz",
+    icon: Hexagon,
+  },
+  { 
+    id: 2, 
+    title: "Numb3rs in the Cosmos", 
+    frequency: "432Hz", 
+    duration: "5:18",
+    visualization: "Golden Spiral",
+    icon: Flower,
+  },
+  { 
+    id: 3, 
+    title: "Infinity Sign", 
+    frequency: "639Hz", 
+    duration: "6:07",
+    visualization: "Torus field",
+    icon: Circle,
+  },
 ];
 
 const FrequencyChamber = () => {
@@ -17,6 +36,8 @@ const FrequencyChamber = () => {
   const [currentTrack, setCurrentTrack] = useState(0);
   const [volume, setVolume] = useState([70]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const CurrentIcon = tracks[currentTrack].icon;
 
   return (
     <section className="relative py-24 overflow-hidden" id="frequency-chamber">
@@ -36,8 +57,7 @@ const FrequencyChamber = () => {
             The Frequency Chamber
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Experience the healing vibrations. Watch the cymatics visualizer respond 
-            to sacred frequencies in real-time.
+            Cymatic Visualizer — Where Sound Becomes Sacred Geometry
           </p>
         </motion.div>
 
@@ -60,24 +80,36 @@ const FrequencyChamber = () => {
               <div className="absolute inset-0 flex items-center justify-center">
                 <motion.div
                   className="relative"
-                  animate={isPlaying ? { scale: [1, 1.2, 1] } : {}}
-                  transition={{ duration: 2, repeat: Infinity }}
+                  animate={isPlaying ? { scale: [1, 1.2, 1], rotate: 360 } : {}}
+                  transition={{ 
+                    scale: { duration: 2, repeat: Infinity },
+                    rotate: { duration: 20, repeat: Infinity, ease: "linear" }
+                  }}
                 >
+                  {/* Dynamic icon based on current track */}
+                  <CurrentIcon 
+                    className="w-32 h-32 text-primary opacity-80" 
+                    strokeWidth={0.5} 
+                  />
+                  
+                  {/* Glow effect */}
+                  <div className="absolute inset-0 blur-xl bg-primary/20 rounded-full" />
+                  
                   {/* Concentric circles for cymatics effect */}
-                  {[...Array(5)].map((_, i) => (
+                  {isPlaying && [...Array(5)].map((_, i) => (
                     <motion.div
                       key={i}
                       className="absolute border border-primary/30 rounded-full"
                       style={{
                         width: `${(i + 1) * 80}px`,
                         height: `${(i + 1) * 80}px`,
-                        left: `${-(i + 1) * 40}px`,
-                        top: `${-(i + 1) * 40}px`,
+                        left: `${-(i + 1) * 40 + 64}px`,
+                        top: `${-(i + 1) * 40 + 64}px`,
                       }}
-                      animate={isPlaying ? {
+                      animate={{
                         scale: [1, 1.1, 1],
                         opacity: [0.3, 0.6, 0.3],
-                      } : {}}
+                      }}
                       transition={{
                         duration: 1.5 + i * 0.3,
                         repeat: Infinity,
@@ -85,7 +117,6 @@ const FrequencyChamber = () => {
                       }}
                     />
                   ))}
-                  <div className="w-8 h-8 rounded-full bg-primary/50 animate-pulse" />
                 </motion.div>
               </div>
 
@@ -94,6 +125,14 @@ const FrequencyChamber = () => {
                 <span className="text-sm text-muted-foreground">Current Frequency</span>
                 <p className="text-xl font-display text-primary text-glow-cyan">
                   {tracks[currentTrack].frequency}
+                </p>
+              </div>
+
+              {/* Visualization info */}
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-background/80 backdrop-blur-sm rounded-lg text-center">
+                <span className="text-xs text-muted-foreground">Visualizing</span>
+                <p className="text-sm text-primary font-medium">
+                  {tracks[currentTrack].visualization}
                 </p>
               </div>
             </div>
@@ -174,7 +213,10 @@ const FrequencyChamber = () => {
                 {tracks.map((track, index) => (
                   <motion.button
                     key={track.id}
-                    onClick={() => setCurrentTrack(index)}
+                    onClick={() => {
+                      setCurrentTrack(index);
+                      setIsPlaying(true);
+                    }}
                     className={`w-full flex items-center justify-between p-3 rounded-lg transition-all ${
                       currentTrack === index
                         ? "bg-primary/10 border-hermetic"
@@ -183,16 +225,21 @@ const FrequencyChamber = () => {
                     whileHover={{ x: 5 }}
                   >
                     <div className="flex items-center gap-4">
-                      <span className={`text-sm ${
-                        currentTrack === index ? "text-primary" : "text-muted-foreground"
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                        currentTrack === index ? "bg-primary/20" : "bg-muted"
                       }`}>
-                        {String(index + 1).padStart(2, "0")}
-                      </span>
-                      <span className={`font-medium ${
-                        currentTrack === index ? "text-foreground" : "text-muted-foreground"
-                      }`}>
-                        {track.title}
-                      </span>
+                        <track.icon className={`h-5 w-5 ${currentTrack === index ? "text-primary" : "text-muted-foreground"}`} />
+                      </div>
+                      <div className="text-left">
+                        <span className={`font-medium block ${
+                          currentTrack === index ? "text-foreground" : "text-muted-foreground"
+                        }`}>
+                          {track.title}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {track.visualization}
+                        </span>
+                      </div>
                     </div>
                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
                       <span className="text-primary/70">{track.frequency}</span>
