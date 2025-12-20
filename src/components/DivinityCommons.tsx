@@ -1,26 +1,30 @@
 import { motion } from "framer-motion";
+import { Waves, Infinity, Brain } from "lucide-react";
 import flowerOfLife from "@/assets/flower-of-life.png";
 import metatronsCube from "@/assets/metatrons-cube.png";
 import torusField from "@/assets/torus-field.png";
 
-const geometryData = [
+const scienceData = [
   {
+    title: "Cymatics",
+    icon: Waves,
+    description: "Scientific evidence shows that specific Hz frequencies organize matter into perfect geometric shapes. When you listen to 528Hz (The Spell Breaker), you are physically restructuring the water within your cells into a coherent, divine state.",
     image: flowerOfLife,
-    title: "The Flower of Life",
-    description: "The fundamental pattern of creation, found in ancient temples worldwide. Its 19 interlocking circles represent the interconnected nature of all existence.",
-    frequency: "432 Hz - The Natural Frequency",
+    highlight: "528Hz",
   },
   {
+    title: "Vortex Mathematics",
+    icon: Infinity,
+    description: 'By utilizing the 3-6-9 sequence, our music aligns with the "Key to the Universe" (Tesla). We use mathematical precision to bypass the ego and target the subconscious mind for rapid healing.',
     image: metatronsCube,
-    title: "Metatron's Cube",
-    description: "Contains all Platonic Solids, the building blocks of physical reality. This sacred form represents the blueprint of creation itself.",
-    frequency: "528 Hz - DNA Repair Frequency",
+    highlight: "3-6-9",
   },
   {
+    title: "The Bio-Chemical Shift",
+    icon: Brain,
+    description: 'Our psychedelic Lofi-Trap is engineered to lower cortisol (the stress hormone) and induce an Alpha-wave state, reversing the damage of clinical "over-drugging."',
     image: torusField,
-    title: "The Torus Field",
-    description: "The self-sustaining energy pattern of the universe. Your heart generates a toroidal field that extends 8-10 feet beyond your body.",
-    frequency: "639 Hz - Connecting Relationships",
+    highlight: "Alpha-wave",
   },
 ];
 
@@ -29,6 +33,11 @@ const DivinityCommons = () => {
     <section className="relative py-24 overflow-hidden" id="divinity-commons">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-secondary/10 to-background" />
+      
+      {/* Background pattern */}
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_25%,_hsl(var(--primary))_1px,_transparent_1px)] bg-[size:60px_60px]" />
+      </div>
 
       <div className="relative z-10 container mx-auto px-4">
         {/* Section Header */}
@@ -37,20 +46,35 @@ const DivinityCommons = () => {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="text-center mb-6"
         >
           <h2 className="text-4xl md:text-6xl font-display text-gradient-sacred mb-4">
-            The Math of God
+            The Divinity Commons
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Sacred geometry reveals the mathematical language underlying all creation. 
-            These patterns resonate at specific frequencies that physically affect human DNA.
+          <p className="text-primary text-xl tracking-widest mb-4">
+            Scientific Evidence
           </p>
         </motion.div>
 
-        {/* Geometry Cards */}
+        {/* Opening Statement */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          viewport={{ once: true }}
+          className="text-center mb-16 max-w-3xl mx-auto"
+        >
+          <h3 className="text-2xl md:text-3xl font-display text-accent mb-4">
+            The Science of the Soul
+          </h3>
+          <p className="text-muted-foreground text-lg italic">
+            Sound is not just something you hear; it is something you <span className="text-primary font-medium">become</span>.
+          </p>
+        </motion.div>
+
+        {/* Science Cards */}
         <div className="grid md:grid-cols-3 gap-8 mb-16">
-          {geometryData.map((item, index) => (
+          {scienceData.map((item, index) => (
             <motion.div
               key={item.title}
               initial={{ opacity: 0, y: 40 }}
@@ -59,26 +83,49 @@ const DivinityCommons = () => {
               viewport={{ once: true }}
               className="group"
             >
-              <div className="border-hermetic rounded-lg p-6 bg-card/50 backdrop-blur-sm hover:shadow-sacred transition-all duration-500">
-                <div className="relative mb-6 overflow-hidden rounded-lg">
-                  <motion.img
+              <div className="border-hermetic rounded-lg p-6 bg-card/50 backdrop-blur-sm hover:shadow-sacred transition-all duration-500 h-full flex flex-col">
+                {/* Image */}
+                <motion.div
+                  whileHover={{ scale: 1.05, rotate: 5 }}
+                  transition={{ duration: 0.5 }}
+                  className="relative mb-6"
+                >
+                  <div className="absolute inset-0 blur-2xl bg-gradient-to-r from-primary/20 to-accent/20 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <img
                     src={item.image}
                     alt={item.title}
-                    className="w-full h-64 object-cover"
-                    whileHover={{ scale: 1.05 }}
-                    transition={{ duration: 0.4 }}
+                    className="w-32 h-32 mx-auto object-contain drop-shadow-[0_0_20px_hsl(187,100%,50%,0.3)]"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-card to-transparent opacity-50" />
+                </motion.div>
+
+                {/* Icon & Title */}
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2 rounded-lg bg-primary/10">
+                    <item.icon className="h-6 w-6 text-primary" />
+                  </div>
+                  <h4 className="text-xl font-display text-foreground">{item.title}</h4>
                 </div>
-                <h3 className="text-xl font-display text-foreground mb-2 group-hover:text-glow-cyan">
-                  {item.title}
-                </h3>
-                <p className="text-muted-foreground text-sm mb-4">
-                  {item.description}
+
+                {/* Content */}
+                <p className="text-muted-foreground leading-relaxed flex-1">
+                  {item.description.split(item.highlight).map((part, i, arr) => (
+                    <span key={i}>
+                      {part}
+                      {i < arr.length - 1 && (
+                        <span className="text-accent font-medium">{item.highlight}</span>
+                      )}
+                    </span>
+                  ))}
                 </p>
-                <div className="flex items-center gap-2 text-primary text-sm">
-                  <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                  {item.frequency}
+
+                {/* Frequency indicator */}
+                <div className="mt-6 pt-4 border-t border-border/30">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                    <span className="text-xs text-primary tracking-widest uppercase">
+                      Frequency Active
+                    </span>
+                  </div>
                 </div>
               </div>
             </motion.div>
