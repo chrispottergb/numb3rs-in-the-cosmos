@@ -14,7 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      audio_tracks: {
+        Row: {
+          created_at: string
+          description: string | null
+          duration: string | null
+          file_url: string
+          frequency: string | null
+          id: string
+          is_default: boolean | null
+          title: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          duration?: string | null
+          file_url: string
+          frequency?: string | null
+          id?: string
+          is_default?: boolean | null
+          title: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          duration?: string | null
+          file_url?: string
+          frequency?: string | null
+          id?: string
+          is_default?: boolean | null
+          title?: string
+          uploaded_by?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

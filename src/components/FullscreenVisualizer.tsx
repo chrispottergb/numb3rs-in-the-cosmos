@@ -1,0 +1,305 @@
+import { useState, useEffect, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { X, Play, Pause, SkipBack, SkipForward, Volume2, Maximize2, Minimize2, Upload, Music } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Slider } from '@/components/ui/slider';
+import SacredGeometryVisualizer from './SacredGeometryVisualizer';
+import AudioUploader from './AudioUploader';
+import { useAudioPlayer } from '@/hooks/useAudioPlayer';
+import { supabase } from '@/integrations/supabase/client';
+import flowerOfLife from '@/assets/flower-of-life.png';
+import metatronsCube from '@/assets/metatrons-cube.png';
+import torusField from '@/assets/torus-field.png';
+
+interface Track {
+  id: string;
+  title: string;
+  frequency: string;
+  duration: string;
+  file_url: string;
+  description?: string;
+}
+
+// Default tracks with the 3 hero images
+const defaultTracks: Track[] = [
+  { 
+    id: 'default-1', 
+    title: "The Spell Breaker", 
+    frequency: "528Hz", 
+    duration: "4:32",
+    file_url: "",
+    description: "Hexagonal structure of 528Hz",
+  },
+  { 
+    id: 'default-2', 
+    title: "Numb3rs in the Cosmos", 
+    frequency: "432Hz", 
+    duration: "5:18",
+    file_url: "",
+    description: "Golden Spiral",
+  },
+  { 
+    id: 'default-3', 
+    title: "Infinity Sign", 
+    frequency: "639Hz", 
+    duration: "6:07",
+    file_url: "",
+    description: "Torus field",
+  },
+];
+
+const trackImages = [flowerOfLife, metatronsCube, torusField];
+
+interface FullscreenVisualizerProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const FullscreenVisualizer = ({ isOpen, onClose }: FullscreenVisualizerProps) => {
+  const [tracks, setTracks] = useState<Track[]>(defaultTracks);
+  const [showUploader, setShowUploader] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  const {
+    isPlaying,
+    currentTrackIndex,
+    currentTime,
+    duration,
+    volume,
+    analyser,
+    togglePlay,
+    next,
+    previous,
+    skipTo,
+    seek,
+    setVolume,
+    currentTrack,
+  } = useAudioPlayer(tracks.filter(t => t.file_url));
+
+  const fetchTracks = useCallback(async () => {
+    const { data, error } = await supabase
+      .from('audio_tracks')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (!error && data) {
+      const dbTracks = data.map(t => ({
+        id: t.id,
+        title: t.title,
+        frequency: t.frequency || '',
+        duration: t.duration || '0:00',
+        file_url: t.file_url,
+        description: t.description,
+      }));
+      setTracks([...dbTracks, ...defaultTracks]);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchTracks();
+    }
+  }, [isOpen, fetchTracks]);
+
+  const toggleFullscreen = useCallback(async () => {
+    if (!document.fullscreenElement) {
+      await document.documentElement.requestFullscreen();
+      setIsFullscreen(true);
+    } else {
+      await document.exitFullscreen();
+      setIsFullscreen(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
+
+  const formatTime = (time: number) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  };
+
+  const hasPlayableTracks = tracks.some(t => t.file_url);
+
+  if (!isOpen) return null;
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-50 bg-background"
+      >
+        {/* Close and fullscreen buttons */}
+        <div className="absolute top-4 right-4 z-50 flex gap-2">
+          <Button variant="ghost" size="icon" onClick={toggleFullscreen}>
+            {isFullscreen ? <Minimize2 className="h-5 w-5" /> : <Maximize2 className="h-5 w-5" />}
+          </Button>
+          <Button variant="ghost" size="icon" onClick={onClose}>
+            <X className="h-5 w-5" />
+          </Button>
+        </div>
+
+        {/* Visualizer Canvas */}
+        <div className="absolute inset-0">
+          <SacredGeometryVisualizer
+            analyser={analyser}
+            isPlaying={isPlaying}
+            currentTrack={currentTrackIndex}
+          />
+        </div>
+
+        {/* Hero Images Display */}
+        <div className="absolute top-8 left-1/2 -translate-x-1/2 flex gap-8 z-10">
+          {trackImages.map((img, index) => (
+            <motion.button
+              key={index}
+              onClick={() => skipTo(index)}
+              className={`relative rounded-lg overflow-hidden transition-all ${
+                currentTrackIndex === index ? 'ring-2 ring-primary scale-110' : 'opacity-60 hover:opacity-100'
+              }`}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <img
+                src={img}
+                alt={defaultTracks[index]?.title || `Track ${index + 1}`}
+                className="w-20 h-20 md:w-24 md:h-24 object-cover"
+              />
+              {currentTrackIndex === index && isPlaying && (
+                <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
+                  <Music className="h-6 w-6 text-primary animate-pulse" />
+                </div>
+              )}
+            </motion.button>
+          ))}
+        </div>
+
+        {/* Track info overlay */}
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-background via-background/80 to-transparent pt-24 pb-8 px-4"
+        >
+          <div className="max-w-4xl mx-auto">
+            {/* Track title */}
+            <div className="text-center mb-6">
+              <h2 className="text-2xl md:text-4xl font-display text-gradient-sacred mb-2">
+                {currentTrack?.title || defaultTracks[currentTrackIndex]?.title}
+              </h2>
+              <p className="text-primary text-glow-cyan text-lg">
+                {currentTrack?.frequency || defaultTracks[currentTrackIndex]?.frequency}
+              </p>
+            </div>
+
+            {/* Progress bar */}
+            <div className="mb-6">
+              <Slider
+                value={[currentTime]}
+                max={duration || 100}
+                step={0.1}
+                onValueChange={([value]) => seek(value)}
+                className="cursor-pointer"
+              />
+              <div className="flex justify-between text-xs text-muted-foreground mt-2">
+                <span>{formatTime(currentTime)}</span>
+                <span>{formatTime(duration)}</span>
+              </div>
+            </div>
+
+            {/* Controls */}
+            <div className="flex items-center justify-center gap-6 mb-6">
+              <Button variant="ghost" size="icon" onClick={previous}>
+                <SkipBack className="h-6 w-6" />
+              </Button>
+              
+              <Button
+                variant="sacred"
+                size="icon"
+                className="w-16 h-16 rounded-full"
+                onClick={togglePlay}
+                disabled={!hasPlayableTracks}
+              >
+                {isPlaying ? (
+                  <Pause className="h-8 w-8" />
+                ) : (
+                  <Play className="h-8 w-8 ml-1" />
+                )}
+              </Button>
+              
+              <Button variant="ghost" size="icon" onClick={next}>
+                <SkipForward className="h-6 w-6" />
+              </Button>
+            </div>
+
+            {/* Volume and Upload */}
+            <div className="flex items-center justify-between gap-8">
+              <div className="flex items-center gap-4 flex-1 max-w-xs">
+                <Volume2 className="h-4 w-4 text-muted-foreground" />
+                <Slider
+                  value={[volume * 100]}
+                  max={100}
+                  step={1}
+                  onValueChange={([value]) => setVolume(value / 100)}
+                />
+              </div>
+
+              <Button
+                variant="hermetic"
+                size="sm"
+                onClick={() => setShowUploader(true)}
+              >
+                <Upload className="h-4 w-4 mr-2" />
+                Upload Track
+              </Button>
+            </div>
+
+            {!hasPlayableTracks && (
+              <p className="text-center text-muted-foreground mt-4 text-sm">
+                Upload an audio file to start playing
+              </p>
+            )}
+
+            {/* Track list */}
+            <div className="mt-8 border-t border-border/30 pt-6">
+              <div className="flex gap-2 overflow-x-auto pb-2">
+                {tracks.map((track, index) => (
+                  <button
+                    key={track.id}
+                    onClick={() => skipTo(index)}
+                    className={`flex-shrink-0 px-4 py-2 rounded-lg transition-all ${
+                      currentTrackIndex === index
+                        ? 'bg-primary/20 border-hermetic text-primary'
+                        : 'bg-muted/30 hover:bg-muted/50 text-muted-foreground'
+                    }`}
+                  >
+                    <span className="font-medium text-sm">{track.title}</span>
+                    {track.frequency && (
+                      <span className="ml-2 text-xs opacity-70">{track.frequency}</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {showUploader && (
+          <AudioUploader
+            onUploadComplete={fetchTracks}
+            onClose={() => setShowUploader(false)}
+          />
+        )}
+      </motion.div>
+    </AnimatePresence>
+  );
+};
+
+export default FullscreenVisualizer;
