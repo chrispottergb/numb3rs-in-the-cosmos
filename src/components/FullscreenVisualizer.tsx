@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import SacredGeometryVisualizer from './SacredGeometryVisualizer';
 import AudioUploader from './AudioUploader';
+import WaveformProgress from './WaveformProgress';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { supabase } from '@/integrations/supabase/client';
 import flowerOfLife from '@/assets/flower-of-life.png';
@@ -119,11 +120,6 @@ const FullscreenVisualizer = ({ isOpen, onClose }: FullscreenVisualizerProps) =>
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, []);
 
-  const formatTime = (time: number) => {
-    const minutes = Math.floor(time / 60);
-    const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-  };
 
   const hasPlayableTracks = tracks.some(t => t.file_url);
 
@@ -199,19 +195,15 @@ const FullscreenVisualizer = ({ isOpen, onClose }: FullscreenVisualizerProps) =>
               </p>
             </div>
 
-            {/* Progress bar */}
+            {/* Waveform Progress */}
             <div className="mb-6">
-              <Slider
-                value={[currentTime]}
-                max={duration || 100}
-                step={0.1}
-                onValueChange={([value]) => seek(value)}
-                className="cursor-pointer"
+              <WaveformProgress
+                analyser={analyser}
+                currentTime={currentTime}
+                duration={duration}
+                onSeek={seek}
+                isPlaying={isPlaying}
               />
-              <div className="flex justify-between text-xs text-muted-foreground mt-2">
-                <span>{formatTime(currentTime)}</span>
-                <span>{formatTime(duration)}</span>
-              </div>
             </div>
 
             {/* Controls */}
