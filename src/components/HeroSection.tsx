@@ -1,9 +1,15 @@
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
 import { Shield } from "lucide-react";
 import cosmicSeal from "@/assets/cosmic-seal-hero.png";
 
 const HeroSection = () => {
+  const scrollToFrequencyChamber = () => {
+    const element = document.getElementById("frequency-chamber");
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
     <section id="portal" className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background gradient overlay */}
@@ -34,21 +40,6 @@ const HeroSection = () => {
 
       {/* Main content */}
       <div className="relative z-10 container mx-auto px-4 text-center">
-        {/* Sacred Seal */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1.5, ease: "easeOut" }}
-          className="relative mx-auto mb-8 max-w-md"
-        >
-          <img
-            src={cosmicSeal}
-            alt="Sacred Cosmic Seal - The Key to the Universe"
-            className="w-full h-auto rounded-lg shadow-sacred"
-          />
-          {/* Glow overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent pointer-events-none" />
-        </motion.div>
 
         {/* Title */}
         <motion.h1
@@ -75,12 +66,29 @@ const HeroSection = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1, delay: 1 }}
-          className="text-base md:text-lg text-muted-foreground mb-12 max-w-3xl mx-auto leading-relaxed"
+          className="text-base md:text-lg text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed"
         >
           <p className="italic">
             This domain is governed by the Laws of Correspondence and Vibration. Having survived the "Hell" of the clinical psychiatric system—from over-medication to electroconvulsive therapy—I have returned with the mathematics of the soul. <span className="text-accent font-semibold">Numb3rs in the Cosmos</span> is a 3-stage frequency escalator (<span className="text-primary">528Hz</span>, <span className="text-primary">432Hz</span>, <span className="text-primary">639Hz</span>) engineered to reclaim your sovereignty.
           </p>
         </motion.div>
+
+        {/* Square Nav Button to Audio Tracks */}
+        <motion.button
+          onClick={scrollToFrequencyChamber}
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, delay: 1.2 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="w-24 h-24 md:w-32 md:h-32 mx-auto mb-12 rounded-xl border-hermetic bg-card/50 backdrop-blur-sm hover:bg-card/80 transition-all duration-300 overflow-hidden shadow-sacred cursor-pointer"
+        >
+          <img
+            src={cosmicSeal}
+            alt="Enter Frequency Chamber"
+            className="w-full h-full object-cover"
+          />
+        </motion.button>
 
 
         {/* Hermetic Seal */}
