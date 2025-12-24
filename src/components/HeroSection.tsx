@@ -9,6 +9,7 @@ import cosmicSeal from "@/assets/cosmic-seal-hero.png";
 import flowerOfLife from "@/assets/flower-of-life.png";
 import metatronsCube from "@/assets/metatrons-cube.png";
 import torusField from "@/assets/torus-field.png";
+import numb3rsBanner from "@/assets/numb3rs-cosmos-banner.jpeg";
 
 const tracks = [
   { 
@@ -136,6 +137,20 @@ const HeroSection = () => {
                 className="w-full h-full object-cover"
               />
             </motion.button>
+          </motion.div>
+
+          {/* Numb3rs in the Cosmos Banner */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.9 }}
+            className="mt-12 max-w-2xl mx-auto"
+          >
+            <img
+              src={numb3rsBanner}
+              alt="Numb3rs in the Cosmos - Frequency Medicine · Sacred Geometry · Divine Mathematics"
+              className="w-full h-auto rounded-xl"
+            />
           </motion.div>
         </div>
 
