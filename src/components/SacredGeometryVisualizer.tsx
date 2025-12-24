@@ -509,7 +509,7 @@ const SacredGeometryVisualizer = ({ analyser, isPlaying, currentTrack }: SacredG
       ctx.stroke();
     }
     
-    // Geometric strobe pattern 2: Radiating triangles
+    // Geometric strobe pattern 2: Radiating triangles (outline only)
     const triangleCount = 12;
     for (let t = 0; t < triangleCount; t++) {
       const angle = (Math.PI * 2 / triangleCount) * t + timeRef.current * 0.002;
@@ -527,15 +527,16 @@ const SacredGeometryVisualizer = ({ analyser, isPlaying, currentTrack }: SacredG
       ctx.closePath();
       
       const triHue = (hue + t * 30) % 360;
-      ctx.fillStyle = `hsla(${triHue}, 100%, 65%, ${intensity * 0.5})`;
-      ctx.shadowBlur = 25 * intensity;
-      ctx.shadowColor = `hsla(${triHue}, 100%, 60%, 0.8)`;
-      ctx.fill();
+      ctx.strokeStyle = `hsla(${triHue}, 100%, 65%, ${intensity * 0.4})`;
+      ctx.lineWidth = 1.5;
+      ctx.shadowBlur = 15 * intensity;
+      ctx.shadowColor = `hsla(${triHue}, 100%, 60%, 0.6)`;
+      ctx.stroke();
       
       ctx.restore();
     }
     
-    // Geometric strobe pattern 3: Sacred geometry star burst
+    // Geometric strobe pattern 3: Sacred geometry star burst (thinner lines)
     const starPoints = 8;
     ctx.beginPath();
     for (let i = 0; i < starPoints * 2; i++) {
@@ -548,28 +549,11 @@ const SacredGeometryVisualizer = ({ analyser, isPlaying, currentTrack }: SacredG
       else ctx.lineTo(px, py);
     }
     ctx.closePath();
-    ctx.strokeStyle = `hsla(${(hue + 180) % 360}, 100%, 80%, ${intensity * 0.6})`;
-    ctx.lineWidth = 2 + intensity * 3;
-    ctx.shadowBlur = 30 * intensity;
-    ctx.shadowColor = `hsla(${(hue + 180) % 360}, 100%, 70%, 0.9)`;
+    ctx.strokeStyle = `hsla(${(hue + 180) % 360}, 100%, 80%, ${intensity * 0.4})`;
+    ctx.lineWidth = 1.5;
+    ctx.shadowBlur = 20 * intensity;
+    ctx.shadowColor = `hsla(${(hue + 180) % 360}, 100%, 70%, 0.6)`;
     ctx.stroke();
-    
-    // Flash overlay for intense bass hits
-    if (intensity > 0.6) {
-      ctx.restore();
-      ctx.save();
-      
-      const flashGradient = ctx.createRadialGradient(
-        centerX, centerY, 0,
-        centerX, centerY, Math.max(width, height) * 0.5
-      );
-      flashGradient.addColorStop(0, `hsla(${hue}, 80%, 90%, ${(intensity - 0.6) * 0.4})`);
-      flashGradient.addColorStop(0.3, `hsla(${hue}, 90%, 60%, ${(intensity - 0.6) * 0.2})`);
-      flashGradient.addColorStop(1, `hsla(${hue}, 100%, 50%, 0)`);
-      
-      ctx.fillStyle = flashGradient;
-      ctx.fillRect(0, 0, width, height);
-    }
     
     ctx.restore();
   }, []);
