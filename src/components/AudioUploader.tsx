@@ -21,8 +21,26 @@ const AudioUploader = ({ onUploadComplete, onClose }: AudioUploaderProps) => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
-      if (!selectedFile.type.startsWith('audio/')) {
-        toast.error('Please select an audio file');
+      const validTypes = [
+        'audio/mpeg',
+        'audio/mp3',
+        'audio/wav',
+        'audio/wave',
+        'audio/x-wav',
+        'audio/ogg',
+        'audio/flac',
+        'audio/aac',
+        'audio/m4a',
+        'audio/x-m4a'
+      ];
+      
+      // Check MIME type or file extension for WAV files (some browsers report different types)
+      const fileExt = selectedFile.name.split('.').pop()?.toLowerCase();
+      const isValidType = validTypes.includes(selectedFile.type) || 
+        ['mp3', 'wav', 'ogg', 'flac', 'aac', 'm4a'].includes(fileExt || '');
+      
+      if (!isValidType) {
+        toast.error('Please select a valid audio file (MP3, WAV, OGG, FLAC, AAC, M4A)');
         return;
       }
       setFile(selectedFile);
@@ -120,7 +138,7 @@ const AudioUploader = ({ onUploadComplete, onClose }: AudioUploaderProps) => {
             <input
               ref={fileInputRef}
               type="file"
-              accept="audio/*"
+              accept="audio/mpeg,audio/mp3,audio/wav,audio/wave,audio/x-wav,audio/ogg,audio/flac,audio/aac,audio/m4a,.mp3,.wav,.ogg,.flac,.aac,.m4a"
               onChange={handleFileChange}
               className="hidden"
             />
@@ -137,6 +155,7 @@ const AudioUploader = ({ onUploadComplete, onClose }: AudioUploaderProps) => {
                 <div className="flex flex-col items-center gap-2 text-muted-foreground">
                   <Upload className="h-8 w-8" />
                   <span className="text-sm">Click to select audio file</span>
+                  <span className="text-xs opacity-70">MP3, WAV, OGG, FLAC, AAC, M4A</span>
                 </div>
               )}
             </button>
