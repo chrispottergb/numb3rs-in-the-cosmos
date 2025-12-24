@@ -3,8 +3,6 @@ import { Link } from "react-router-dom";
 
 const navLinks = [
   { name: "Divinity Commons", href: "#divinity-commons" },
-  { name: "Apothecary", href: "#apothecary" },
-  { name: "Frequency Chamber", href: "#frequency-chamber" },
   { name: "Resonance Room", href: "#resonance-room" },
 ];
 
@@ -19,7 +17,7 @@ const Navigation = () => {
       <nav className="container mx-auto px-4 h-16 flex items-center justify-between">
         {/* Logo */}
         <Link 
-          to="/" 
+          to="/home" 
           className="text-xl font-display text-gradient-sacred hover:text-glow-cyan transition-all"
         >
           N3C
@@ -36,6 +34,12 @@ const Navigation = () => {
               {link.name}
             </a>
           ))}
+          <Link
+            to="/merch"
+            className="text-sm text-muted-foreground hover:text-primary transition-colors font-medium tracking-wide"
+          >
+            Merch
+          </Link>
         </div>
 
         {/* Mobile menu indicator */}
