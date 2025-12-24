@@ -4,10 +4,16 @@ import { Download, Disc, ShoppingBag } from "lucide-react";
 import lapisLazuliImg from "@/assets/lapis-lazuli-crystal.png";
 import seleniteImg from "@/assets/selenite-crystal.png";
 import blackTourmalineImg from "@/assets/black-tourmaline-crystal.png";
-import protectionHoodieImg from "@/assets/protection-hoodie.png";
-import protectionJacketImg from "@/assets/protection-jacket.png";
-import protectionHatImg from "@/assets/protection-hat.png";
-import raiment369Img from "@/assets/369-raiment.png";
+// Apparel images
+import hoodieBlackImg from "@/assets/hoodie-black.jpeg";
+import hoodieNavyImg from "@/assets/hoodie-navy.jpeg";
+import hoodieOrangeImg from "@/assets/hoodie-orange.jpeg";
+import hoodieGrayImg from "@/assets/hoodie-gray.jpeg";
+import jacketBlackImg from "@/assets/jacket-black.jpeg";
+import jacketNavyImg from "@/assets/jacket-navy.jpeg";
+import jacketRedImg from "@/assets/jacket-red.jpeg";
+import beanieOrangeImg from "@/assets/beanie-orange.jpeg";
+import beanieWhiteImg from "@/assets/beanie-white.jpeg";
 
 const losslessArchive = [
   {
@@ -28,14 +34,13 @@ const losslessArchive = [
   },
 ];
 
-const toolkit = [
+const crystals = [
   {
     id: 3,
     name: "Lapis Lazuli",
     description: "Charged at 528Hz during the Numb3rs master sessions. Enhances truth and inner wisdom.",
     frequency: "528Hz Charged",
     image: lapisLazuliImg,
-    color: "primary",
   },
   {
     id: 4,
@@ -43,7 +48,6 @@ const toolkit = [
     description: "Charged at 528Hz during the Numb3rs master sessions. Clears energy blockages and amplifies frequency.",
     frequency: "528Hz Charged",
     image: seleniteImg,
-    color: "foreground",
   },
   {
     id: 5,
@@ -51,39 +55,78 @@ const toolkit = [
     description: "Charged at 528Hz during the Numb3rs master sessions. Protection against negative frequencies.",
     frequency: "528Hz Charged",
     image: blackTourmalineImg,
-    color: "muted-foreground",
   },
+];
+
+const hoodies = [
   {
     id: 6,
-    name: "The 3-6-9 Raiment",
-    description: "Ceremonial garment featuring Tesla's divine numbers to align the wearer with universal frequency.",
+    name: "Caduceus Hoodie - Black",
+    description: "Premium hoodie featuring the Staff of Hermes with serpent wisdom and sacred geometry sleeve art.",
     frequency: "Sacred Protection",
-    image: raiment369Img,
-    color: "accent",
+    image: hoodieBlackImg,
   },
   {
     id: 7,
-    name: "Sigil Hoodie",
-    description: "Premium hoodie with embroidered protection sigils. Shields your aura during daily activities.",
+    name: "Caduceus Hoodie - Navy",
+    description: "Premium hoodie featuring the Staff of Hermes with golden serpent design and hermetic symbols.",
     frequency: "Sacred Protection",
-    image: protectionHoodieImg,
-    color: "primary",
+    image: hoodieNavyImg,
   },
   {
     id: 8,
-    name: "Winter Guardian Jacket",
-    description: "Insulated winter jacket featuring the Flower of Life pattern and hermetic protection symbols.",
+    name: "Caduceus Hoodie - Orange",
+    description: "Premium hoodie featuring the Staff of Hermes with detailed alchemical annotations.",
     frequency: "Sacred Protection",
-    image: protectionJacketImg,
-    color: "foreground",
+    image: hoodieOrangeImg,
   },
   {
     id: 9,
-    name: "Third Eye Beanie",
-    description: "Protective beanie with embroidered all-seeing eye and sacred geometry to guard the crown chakra.",
+    name: "Caduceus Hoodie - Gray",
+    description: "Premium hoodie featuring the Staff of Hermes with subtle protective sigil artwork.",
     frequency: "Sacred Protection",
-    image: protectionHatImg,
-    color: "muted-foreground",
+    image: hoodieGrayImg,
+  },
+];
+
+const jackets = [
+  {
+    id: 10,
+    name: "Guardian Jacket - Black",
+    description: "Insulated winter jacket with full caduceus embroidery and hermetic sleeve symbols.",
+    frequency: "Sacred Protection",
+    image: jacketBlackImg,
+  },
+  {
+    id: 11,
+    name: "Guardian Jacket - Navy",
+    description: "Insulated winter jacket with orange-gold caduceus design and sacred geometry accents.",
+    frequency: "Sacred Protection",
+    image: jacketNavyImg,
+  },
+  {
+    id: 12,
+    name: "Guardian Jacket - Crimson",
+    description: "Insulated winter jacket with silver-white caduceus embroidery and alchemical symbols.",
+    frequency: "Sacred Protection",
+    image: jacketRedImg,
+  },
+];
+
+const beanies = [
+  {
+    id: 13,
+    name: "Sigil Beanie - Orange",
+    description: "Protective beanie with embroidered triangle sigil and concentric circle design.",
+    frequency: "Crown Chakra Shield",
+    image: beanieOrangeImg,
+  },
+  {
+    id: 14,
+    name: "Sigil Beanie - White",
+    description: "Protective beanie with embroidered triangle sigil and concentric circle design.",
+    frequency: "Crown Chakra Shield",
+    image: beanieWhiteImg,
   },
 ];
 
@@ -155,7 +198,7 @@ const ApothecarySection = () => {
           </div>
         </motion.div>
 
-        {/* The Tool Kit */}
+        {/* Charged Crystals */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -163,11 +206,11 @@ const ApothecarySection = () => {
           viewport={{ once: true }}
         >
           <h3 className="text-2xl md:text-3xl font-display text-accent text-center mb-10 tracking-wider">
-            The Tool Kit
+            Charged Crystals
           </h3>
           
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {toolkit.map((item, index) => (
+          <div className="grid sm:grid-cols-3 gap-6 mb-16">
+            {crystals.map((item, index) => (
               <motion.div
                 key={item.id}
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -186,13 +229,136 @@ const ApothecarySection = () => {
                 </div>
                 <h4 className="text-lg font-display text-foreground mb-2">{item.name}</h4>
                 <p className="text-muted-foreground text-sm mb-3">{item.description}</p>
-                <span className={`
-                  text-xs font-medium tracking-wider
-                  ${item.color === 'primary' ? 'text-primary' : ''}
-                  ${item.color === 'foreground' ? 'text-foreground' : ''}
-                  ${item.color === 'muted-foreground' ? 'text-muted-foreground' : ''}
-                  ${item.color === 'accent' ? 'text-accent' : ''}
-                `}>
+                <span className="text-xs font-medium tracking-wider text-primary">
+                  {item.frequency}
+                </span>
+                <Button variant="hermetic" size="sm" className="w-full mt-4">
+                  <ShoppingBag className="mr-2 h-4 w-4" />
+                  Select
+                </Button>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Protection Hoodies */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.5 }}
+          viewport={{ once: true }}
+        >
+          <h3 className="text-2xl md:text-3xl font-display text-accent text-center mb-10 tracking-wider">
+            Caduceus Hoodies
+          </h3>
+          
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+            {hoodies.map((item, index) => (
+              <motion.div
+                key={item.id}
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.1 * index }}
+                whileHover={{ scale: 1.05, y: -10 }}
+                className="group border-hermetic rounded-xl p-4 bg-card/50 backdrop-blur-sm hover:bg-card/80 transition-all duration-300 text-center"
+              >
+                <div className="aspect-square w-full mb-4 rounded-lg overflow-hidden group-hover:scale-105 transition-transform duration-300">
+                  <img 
+                    src={item.image} 
+                    alt={item.name} 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <h4 className="text-base font-display text-foreground mb-2">{item.name}</h4>
+                <p className="text-muted-foreground text-xs mb-3">{item.description}</p>
+                <span className="text-xs font-medium tracking-wider text-accent">
+                  {item.frequency}
+                </span>
+                <Button variant="hermetic" size="sm" className="w-full mt-4">
+                  <ShoppingBag className="mr-2 h-4 w-4" />
+                  Select
+                </Button>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Guardian Jackets */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
+          viewport={{ once: true }}
+        >
+          <h3 className="text-2xl md:text-3xl font-display text-accent text-center mb-10 tracking-wider">
+            Guardian Jackets
+          </h3>
+          
+          <div className="grid sm:grid-cols-3 gap-6 mb-16">
+            {jackets.map((item, index) => (
+              <motion.div
+                key={item.id}
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.1 * index }}
+                whileHover={{ scale: 1.05, y: -10 }}
+                className="group border-hermetic rounded-xl p-4 bg-card/50 backdrop-blur-sm hover:bg-card/80 transition-all duration-300 text-center"
+              >
+                <div className="aspect-square w-full mb-4 rounded-lg overflow-hidden group-hover:scale-105 transition-transform duration-300">
+                  <img 
+                    src={item.image} 
+                    alt={item.name} 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <h4 className="text-base font-display text-foreground mb-2">{item.name}</h4>
+                <p className="text-muted-foreground text-xs mb-3">{item.description}</p>
+                <span className="text-xs font-medium tracking-wider text-accent">
+                  {item.frequency}
+                </span>
+                <Button variant="hermetic" size="sm" className="w-full mt-4">
+                  <ShoppingBag className="mr-2 h-4 w-4" />
+                  Select
+                </Button>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Sigil Beanies */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.7 }}
+          viewport={{ once: true }}
+        >
+          <h3 className="text-2xl md:text-3xl font-display text-accent text-center mb-10 tracking-wider">
+            Sigil Beanies
+          </h3>
+          
+          <div className="grid sm:grid-cols-2 gap-6 max-w-2xl mx-auto">
+            {beanies.map((item, index) => (
+              <motion.div
+                key={item.id}
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.1 * index }}
+                whileHover={{ scale: 1.05, y: -10 }}
+                className="group border-hermetic rounded-xl p-4 bg-card/50 backdrop-blur-sm hover:bg-card/80 transition-all duration-300 text-center"
+              >
+                <div className="aspect-square w-full mb-4 rounded-lg overflow-hidden group-hover:scale-105 transition-transform duration-300">
+                  <img 
+                    src={item.image} 
+                    alt={item.name} 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <h4 className="text-base font-display text-foreground mb-2">{item.name}</h4>
+                <p className="text-muted-foreground text-xs mb-3">{item.description}</p>
+                <span className="text-xs font-medium tracking-wider text-accent">
                   {item.frequency}
                 </span>
                 <Button variant="hermetic" size="sm" className="w-full mt-4">
