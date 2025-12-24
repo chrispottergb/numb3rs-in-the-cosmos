@@ -107,7 +107,7 @@ const TrackSlotUploader = ({
             title,
             frequency: frequency || null,
             file_url: publicUrl,
-            description: `Track slot ${slotIndex + 1}`,
+            description: `Track slot ${slotIndex}`,
           })
           .eq('id', existingTrack.id);
 
@@ -119,7 +119,7 @@ const TrackSlotUploader = ({
             title,
             frequency: frequency || null,
             file_url: publicUrl,
-            description: `Track slot ${slotIndex + 1}`,
+            description: `Track slot ${slotIndex}`,
           });
 
         if (insertError) throw insertError;
