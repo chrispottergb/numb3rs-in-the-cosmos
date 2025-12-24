@@ -148,11 +148,11 @@ const HeroSection = () => {
 
       {/* Frequency Chamber Dialog */}
       <Dialog open={showChamber} onOpenChange={setShowChamber}>
-        <DialogContent className="max-w-2xl w-[90vw] max-h-[90vh] overflow-y-auto overflow-x-hidden bg-background/95 backdrop-blur-xl border-hermetic p-4 md:p-6 fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+        <DialogContent className="max-w-sm w-[85vw] h-auto bg-background/95 backdrop-blur-xl border-hermetic p-4 overflow-hidden">
 
           {/* 3 Hero Images Grid */}
-          <div className="flex justify-center mb-8">
-            <div className="grid grid-cols-3 gap-3 w-full max-w-md">
+          <div className="flex justify-center mb-4">
+            <div className="grid grid-cols-3 gap-2 w-full">
               {tracks.map((track, index) => (
                 <motion.div
                   key={track.id}
@@ -175,21 +175,17 @@ const HeroSection = () => {
                       hoveredTrack === index ? 'opacity-100' : 'opacity-0'
                     }`}>
                       <div className="absolute inset-0 flex flex-col items-center justify-center">
-                        <Play className="h-6 w-6 text-primary mb-1" />
-                        <span className="text-primary font-display text-xs">Play</span>
+                        <Play className="h-5 w-5 text-primary" />
                       </div>
                     </div>
-
-                    {/* Glow effect */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent pointer-events-none" />
                   </div>
 
                   {/* Track info */}
-                  <div className="mt-2 text-center">
-                    <h3 className="text-sm font-display text-foreground mb-0.5">
+                  <div className="mt-1 text-center">
+                    <h3 className="text-xs font-display text-foreground">
                       {track.title}
                     </h3>
-                    <p className="text-primary text-glow-cyan text-xs">
+                    <p className="text-primary text-glow-cyan text-[10px]">
                       {track.frequency}
                     </p>
                   </div>
@@ -202,11 +198,11 @@ const HeroSection = () => {
           <div className="flex justify-center">
             <Button
               variant="sacred"
-              size="xl"
+              size="default"
               onClick={() => setShowVisualizer(true)}
             >
-              <Maximize2 className="h-5 w-5 mr-2" />
-              Open Fullscreen Visualizer
+              <Maximize2 className="h-4 w-4 mr-2" />
+              Fullscreen Visualizer
             </Button>
           </div>
         </DialogContent>
