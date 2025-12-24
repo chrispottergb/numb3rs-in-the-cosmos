@@ -2,7 +2,6 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 
 const navLinks = [
-  { name: "Divinity Commons", href: "#divinity-commons" },
   { name: "Resonance Room", href: "#resonance-room" },
 ];
 
@@ -25,6 +24,18 @@ const Navigation = () => {
 
         {/* Navigation Links */}
         <div className="hidden md:flex items-center gap-8">
+          <Link
+            to="/science"
+            className="text-sm text-muted-foreground hover:text-primary transition-colors font-medium tracking-wide"
+          >
+            The Science
+          </Link>
+          <Link
+            to="/merch"
+            className="text-sm text-muted-foreground hover:text-primary transition-colors font-medium tracking-wide"
+          >
+            Merch
+          </Link>
           {navLinks.map((link) => (
             <a
               key={link.name}
@@ -34,12 +45,6 @@ const Navigation = () => {
               {link.name}
             </a>
           ))}
-          <Link
-            to="/merch"
-            className="text-sm text-muted-foreground hover:text-primary transition-colors font-medium tracking-wide"
-          >
-            Merch
-          </Link>
         </div>
 
         {/* Mobile menu indicator */}
