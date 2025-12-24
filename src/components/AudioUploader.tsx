@@ -3,6 +3,7 @@ import { Upload, Music, X, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -13,6 +14,7 @@ interface AudioUploaderProps {
 
 const AudioUploader = ({ onUploadComplete, onClose }: AudioUploaderProps) => {
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [title, setTitle] = useState('');
   const [frequency, setFrequency] = useState('');
   const [file, setFile] = useState<File | null>(null);
@@ -57,16 +59,44 @@ const AudioUploader = ({ onUploadComplete, onClose }: AudioUploaderProps) => {
     }
 
     setUploading(true);
+    setUploadProgress(0);
 
     try {
       const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
 
-      const { error: uploadError } = await supabase.storage
-        .from('audio-tracks')
-        .upload(fileName, file);
+      // Use XMLHttpRequest for progress tracking
+      const formData = new FormData();
+      formData.append('file', file);
 
-      if (uploadError) throw uploadError;
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      await new Promise<void>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        
+        xhr.upload.addEventListener('progress', (event) => {
+          if (event.lengthComputable) {
+            const percent = Math.round((event.loaded / event.total) * 100);
+            setUploadProgress(percent);
+          }
+        });
+        
+        xhr.addEventListener('load', () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            resolve();
+          } else {
+            reject(new Error(`Upload failed with status ${xhr.status}`));
+          }
+        });
+        
+        xhr.addEventListener('error', () => reject(new Error('Upload failed')));
+        
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+        xhr.open('POST', `${supabaseUrl}/storage/v1/object/audio-tracks/${fileName}`);
+        xhr.setRequestHeader('Authorization', `Bearer ${session?.access_token || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`);
+        xhr.setRequestHeader('x-upsert', 'true');
+        xhr.send(file);
+      });
 
       const { data: { publicUrl } } = supabase.storage
         .from('audio-tracks')
@@ -91,6 +121,7 @@ const AudioUploader = ({ onUploadComplete, onClose }: AudioUploaderProps) => {
       toast.error('Failed to upload track');
     } finally {
       setUploading(false);
+      setUploadProgress(0);
     }
   };
 
@@ -161,6 +192,16 @@ const AudioUploader = ({ onUploadComplete, onClose }: AudioUploaderProps) => {
             </button>
           </div>
 
+          {uploading && (
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm text-muted-foreground">
+                <span>Uploading...</span>
+                <span>{uploadProgress}%</span>
+              </div>
+              <Progress value={uploadProgress} className="h-2" />
+            </div>
+          )}
+
           <Button
             variant="sacred"
             className="w-full"
@@ -170,7 +211,7 @@ const AudioUploader = ({ onUploadComplete, onClose }: AudioUploaderProps) => {
             {uploading ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Uploading...
+                Uploading {uploadProgress}%
               </>
             ) : (
               <>
