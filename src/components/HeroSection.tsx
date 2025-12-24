@@ -41,12 +41,10 @@ const HeroSection = () => {
           transition={{ duration: 1.5, ease: "easeOut" }}
           className="relative mx-auto mb-8 max-w-md"
         >
-          <motion.img
+          <img
             src={cosmicSeal}
             alt="Sacred Cosmic Seal - The Key to the Universe"
             className="w-full h-auto rounded-lg shadow-sacred"
-            animate={{ rotate: 360 }}
-            transition={{ duration: 120, repeat: Infinity, ease: "linear" }}
           />
           {/* Glow overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent pointer-events-none" />
