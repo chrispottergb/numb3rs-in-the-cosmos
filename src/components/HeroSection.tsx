@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Play, Maximize2, Upload } from "lucide-react";
+import { Play, Maximize2 } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import FullscreenVisualizer from "./FullscreenVisualizer";
-import AudioUploader from "./AudioUploader";
+
 import cosmicSeal from "@/assets/cosmic-seal-hero.png";
 import flowerOfLife from "@/assets/flower-of-life.png";
 import metatronsCube from "@/assets/metatrons-cube.png";
@@ -38,7 +38,7 @@ const tracks = [
 const HeroSection = () => {
   const [showChamber, setShowChamber] = useState(false);
   const [showVisualizer, setShowVisualizer] = useState(false);
-  const [showUploader, setShowUploader] = useState(false);
+  
   const [hoveredTrack, setHoveredTrack] = useState<number | null>(null);
 
   return (
@@ -207,8 +207,8 @@ const HeroSection = () => {
             </div>
           </div>
 
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          {/* CTA Button */}
+          <div className="flex justify-center">
             <Button
               variant="sacred"
               size="xl"
@@ -216,14 +216,6 @@ const HeroSection = () => {
             >
               <Maximize2 className="h-5 w-5 mr-2" />
               Open Fullscreen Visualizer
-            </Button>
-            <Button
-              variant="hermetic"
-              size="xl"
-              onClick={() => setShowUploader(true)}
-            >
-              <Upload className="h-5 w-5 mr-2" />
-              Upload Your Music
             </Button>
           </div>
         </DialogContent>
@@ -234,12 +226,6 @@ const HeroSection = () => {
         onClose={() => setShowVisualizer(false)}
       />
 
-      {showUploader && (
-        <AudioUploader
-          onUploadComplete={() => setShowUploader(false)}
-          onClose={() => setShowUploader(false)}
-        />
-      )}
     </>
   );
 };
