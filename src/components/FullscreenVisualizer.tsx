@@ -236,14 +236,6 @@ const FullscreenVisualizer = ({ isOpen, onClose }: FullscreenVisualizerProps) =>
                   )}
                 </motion.button>
                 
-                <div className="text-center max-w-24">
-                  <p className="text-xs font-medium truncate">
-                    {slotTrack?.title || defaultSlots[index].title}
-                  </p>
-                  <p className="text-xs text-primary/70">
-                    {slotTrack?.frequency || defaultSlots[index].frequency}
-                  </p>
-                </div>
               </motion.div>
             );
           })}
