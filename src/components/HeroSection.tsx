@@ -95,11 +95,25 @@ const HeroSection = () => {
             </p>
           </motion.div>
 
+          {/* Numb3rs in the Cosmos Banner */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.5 }}
+            className="mb-8 max-w-2xl mx-auto"
+          >
+            <img
+              src={numb3rsBanner}
+              alt="Numb3rs in the Cosmos - Frequency Medicine · Sacred Geometry · Divine Mathematics"
+              className="w-full h-auto rounded-xl"
+            />
+          </motion.div>
+
           {/* Title */}
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.5 }}
+            transition={{ duration: 0.8, delay: 0.7 }}
             className="font-display mb-8"
           >
             <span className="text-gradient-sacred text-2xl md:text-3xl lg:text-4xl">DR. POTTER, DMA</span>
@@ -109,7 +123,7 @@ const HeroSection = () => {
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.7 }}
+            transition={{ duration: 0.8, delay: 0.9 }}
             className="relative w-40 h-40 md:w-56 md:h-56 lg:w-64 lg:h-64 mx-auto"
           >
             {/* Pulsing glow effect */}
@@ -137,20 +151,6 @@ const HeroSection = () => {
                 className="w-full h-full object-cover"
               />
             </motion.button>
-          </motion.div>
-
-          {/* Numb3rs in the Cosmos Banner */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.9 }}
-            className="mt-12 max-w-2xl mx-auto"
-          >
-            <img
-              src={numb3rsBanner}
-              alt="Numb3rs in the Cosmos - Frequency Medicine · Sacred Geometry · Divine Mathematics"
-              className="w-full h-auto rounded-xl"
-            />
           </motion.div>
         </div>
 
