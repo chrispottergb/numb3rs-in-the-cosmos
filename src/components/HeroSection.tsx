@@ -43,7 +43,7 @@ const HeroSection = () => {
 
   return (
     <>
-      <section id="portal" className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      <section id="portal" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
         {/* Background gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-background via-secondary/20 to-background" />
         
