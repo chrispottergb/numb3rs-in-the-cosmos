@@ -227,7 +227,7 @@ const FullscreenVisualizer = ({ isOpen, onClose }: FullscreenVisualizerProps) =>
                   <img
                     src={img}
                     alt={slotTrack?.title || defaultSlots[index].title}
-                    className="w-20 h-20 md:w-24 md:h-24 object-cover"
+                    className="w-28 h-28 md:w-36 md:h-36 object-cover"
                   />
                   {isCurrentlyPlaying && isPlaying && (
                     <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
