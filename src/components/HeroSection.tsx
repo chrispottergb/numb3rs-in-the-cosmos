@@ -9,7 +9,7 @@ import cosmicSeal from "@/assets/cosmic-seal-hero.png";
 import flowerOfLife from "@/assets/flower-of-life.png";
 import metatronsCube from "@/assets/metatrons-cube.png";
 import torusField from "@/assets/torus-field.png";
-import numb3rsBanner from "@/assets/numb3rs-cosmos-banner.jpeg";
+
 
 const tracks = [
   { 
@@ -43,7 +43,7 @@ const HeroSection = () => {
 
   return (
     <>
-      <section id="portal" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
+      <section id="portal" className="relative min-h-[80vh] flex items-center justify-center overflow-hidden pt-20">
         {/* Background gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-background via-secondary/20 to-background" />
         
@@ -125,7 +125,7 @@ const HeroSection = () => {
         </div>
 
         {/* Bottom fade */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent pointer-events-none" />
+        <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent pointer-events-none" />
       </section>
 
       {/* Frequency Chamber Dialog */}
