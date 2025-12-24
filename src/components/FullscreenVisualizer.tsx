@@ -245,21 +245,21 @@ const FullscreenVisualizer = ({ isOpen, onClose }: FullscreenVisualizerProps) =>
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-background via-background/80 to-transparent pt-24 pb-8 px-4"
+          className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-background via-background/80 to-transparent pt-12 pb-4 px-4"
         >
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-2xl mx-auto">
             {/* Track title */}
-            <div className="text-center mb-6">
-              <h2 className="text-2xl md:text-4xl font-display text-gradient-sacred mb-2">
+            <div className="text-center mb-3">
+              <h2 className="text-xl md:text-2xl font-display text-gradient-sacred mb-1">
                 {currentTrack?.title || defaultSlots[0].title}
               </h2>
-              <p className="text-primary text-glow-cyan text-lg">
+              <p className="text-primary text-glow-cyan text-sm">
                 {currentTrack?.frequency || defaultSlots[0].frequency}
               </p>
             </div>
 
             {/* Waveform Progress */}
-            <div className="mb-6">
+            <div className="mb-3">
               <WaveformProgress
                 analyser={analyser}
                 currentTime={currentTime}
@@ -269,46 +269,46 @@ const FullscreenVisualizer = ({ isOpen, onClose }: FullscreenVisualizerProps) =>
               />
             </div>
 
-            {/* Controls */}
-            <div className="flex items-center justify-center gap-6 mb-6">
-              <Button variant="ghost" size="icon" onClick={previous}>
-                <SkipBack className="h-6 w-6" />
-              </Button>
-              
-              <Button
-                variant="sacred"
-                size="icon"
-                className="w-16 h-16 rounded-full"
-                onClick={togglePlay}
-                disabled={!hasPlayableTracks}
-              >
-                {isPlaying ? (
-                  <Pause className="h-8 w-8" />
-                ) : (
-                  <Play className="h-8 w-8 ml-1" />
-                )}
-              </Button>
-              
-              <Button variant="ghost" size="icon" onClick={next}>
-                <SkipForward className="h-6 w-6" />
-              </Button>
-            </div>
-
-            {/* Volume */}
-            <div className="flex items-center justify-center gap-8">
-              <div className="flex items-center gap-4 flex-1 max-w-xs">
-                <Volume2 className="h-4 w-4 text-muted-foreground" />
+            {/* Compact Controls Row */}
+            <div className="flex items-center justify-center gap-4">
+              <div className="flex items-center gap-2">
+                <Volume2 className="h-3 w-3 text-muted-foreground" />
                 <Slider
                   value={[volume * 100]}
                   max={100}
                   step={1}
                   onValueChange={([value]) => setVolume(value / 100)}
+                  className="w-20"
                 />
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={previous}>
+                  <SkipBack className="h-4 w-4" />
+                </Button>
+                
+                <Button
+                  variant="sacred"
+                  size="icon"
+                  className="w-10 h-10 rounded-full"
+                  onClick={togglePlay}
+                  disabled={!hasPlayableTracks}
+                >
+                  {isPlaying ? (
+                    <Pause className="h-5 w-5" />
+                  ) : (
+                    <Play className="h-5 w-5 ml-0.5" />
+                  )}
+                </Button>
+                
+                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={next}>
+                  <SkipForward className="h-4 w-4" />
+                </Button>
               </div>
             </div>
 
             {!hasPlayableTracks && (
-              <p className="text-center text-muted-foreground mt-4 text-sm">
+              <p className="text-center text-muted-foreground mt-2 text-xs">
                 Click on a track slot above to upload audio
               </p>
             )}
