@@ -10,10 +10,14 @@ const SacredGeometryVisualizer = ({ analyser, isPlaying, currentTrack }: SacredG
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number>();
   const rotationRef = useRef(0);
+  const rotation2Ref = useRef(0);
+  const rotation3Ref = useRef(0);
   const timeRef = useRef(0);
   const lastBassRef = useRef(0);
   const lastMidRef = useRef(0);
   const tetraFlashRef = useRef(0);
+  const breatheRef = useRef(0);
+  const orbitRef = useRef(0);
 
   // Color schemes - clean, distinct colors for each track
   const colorSchemes = [
@@ -72,84 +76,111 @@ const SacredGeometryVisualizer = ({ analyser, isPlaying, currentTrack }: SacredG
     ctx.restore();
   }, []);
 
-  // Track 1: Flower of Life - precise interlocking circles
+  // Track 1: Flower of Life - precise interlocking circles with enhanced motion
   const drawFlowerOfLife = useCallback((ctx: CanvasRenderingContext2D, centerX: number, centerY: number, baseSize: number, bass: number, highs: number, colors: typeof colorSchemes[0]) => {
-    const wobble = 1 + (bass / 255) * 0.15;
-    const pulse = 1 + (highs / 255) * 0.1;
+    const wobble = 1 + (bass / 255) * 0.2;
+    const pulse = 1 + (highs / 255) * 0.15;
+    const breathe = Math.sin(breatheRef.current) * 0.1 + 1;
     
     ctx.save();
     ctx.translate(centerX, centerY);
-    ctx.rotate(rotationRef.current * 0.02);
     
-    const radius = baseSize * 0.3 * wobble;
+    const radius = baseSize * 0.3 * wobble * breathe;
     
-    // Central circle
+    // Central circle with rotation
+    ctx.save();
+    ctx.rotate(rotationRef.current * 0.1);
     ctx.beginPath();
     ctx.arc(0, 0, radius * pulse, 0, Math.PI * 2);
     ctx.strokeStyle = colors.primary;
     ctx.lineWidth = 1.5;
     ctx.globalAlpha = 0.8 + (highs / 255) * 0.2;
     ctx.stroke();
+    ctx.restore();
     
-    // First ring - 6 circles
+    // First ring - 6 circles with orbital motion
     for (let i = 0; i < 6; i++) {
-      const angle = (Math.PI / 3) * i + rotationRef.current * 0.01;
-      const x = radius * Math.cos(angle);
-      const y = radius * Math.sin(angle);
+      const baseAngle = (Math.PI / 3) * i;
+      const orbitOffset = Math.sin(orbitRef.current + i * 0.5) * 0.1;
+      const angle = baseAngle + rotationRef.current * 0.08 + orbitOffset;
+      const dist = radius * (1 + Math.sin(breatheRef.current + i) * 0.08);
+      const x = dist * Math.cos(angle);
+      const y = dist * Math.sin(angle);
       
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(rotation2Ref.current * 0.15);
       ctx.beginPath();
-      ctx.arc(x, y, radius * pulse, 0, Math.PI * 2);
+      ctx.arc(0, 0, radius * pulse * (1 + Math.sin(orbitRef.current + i) * 0.1), 0, Math.PI * 2);
       ctx.strokeStyle = i % 2 === 0 ? colors.primary : colors.secondary;
       ctx.globalAlpha = 0.6 + (highs / 255) * 0.3;
       ctx.stroke();
+      ctx.restore();
     }
     
-    // Second ring - 12 circles
+    // Second ring - 12 circles with counter-rotation
     for (let i = 0; i < 12; i++) {
-      const angle = (Math.PI / 6) * i + rotationRef.current * 0.005;
-      const x = radius * 1.732 * Math.cos(angle);
-      const y = radius * 1.732 * Math.sin(angle);
+      const baseAngle = (Math.PI / 6) * i;
+      const angle = baseAngle - rotation2Ref.current * 0.05;
+      const pulseDist = 1.732 + Math.sin(breatheRef.current * 1.5 + i * 0.3) * 0.15;
+      const x = radius * pulseDist * Math.cos(angle);
+      const y = radius * pulseDist * Math.sin(angle);
       
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(-rotationRef.current * 0.1);
       ctx.beginPath();
-      ctx.arc(x, y, radius * pulse, 0, Math.PI * 2);
+      const circleSize = radius * pulse * (0.9 + Math.sin(orbitRef.current * 2 + i) * 0.15);
+      ctx.arc(0, 0, circleSize, 0, Math.PI * 2);
       ctx.strokeStyle = colors.secondary;
       ctx.globalAlpha = 0.4 + (highs / 255) * 0.3;
       ctx.stroke();
+      ctx.restore();
     }
     
-    // Outer ring - 18 circles
+    // Outer ring - 18 circles with wave motion
     for (let i = 0; i < 18; i++) {
-      const angle = (Math.PI / 9) * i;
-      const x = radius * 2.6 * wobble * Math.cos(angle);
-      const y = radius * 2.6 * wobble * Math.sin(angle);
+      const baseAngle = (Math.PI / 9) * i;
+      const angle = baseAngle + rotation3Ref.current * 0.03;
+      const waveOffset = Math.sin(orbitRef.current * 1.5 + i * 0.4) * 0.2;
+      const dist = radius * (2.6 + waveOffset) * wobble;
+      const x = dist * Math.cos(angle);
+      const y = dist * Math.sin(angle);
       
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(rotation2Ref.current * 0.2);
       ctx.beginPath();
-      ctx.arc(x, y, radius * pulse * 0.8, 0, Math.PI * 2);
+      ctx.arc(0, 0, radius * pulse * (0.7 + Math.sin(breatheRef.current + i * 0.2) * 0.15), 0, Math.PI * 2);
       ctx.strokeStyle = colors.primary;
       ctx.globalAlpha = 0.3 + (highs / 255) * 0.2;
       ctx.stroke();
+      ctx.restore();
     }
     
     ctx.restore();
   }, []);
 
-  // Track 2: Metatron's Cube - precise hexagonal structure
+  // Track 2: Metatron's Cube - precise hexagonal structure with enhanced motion
   const drawMetatronsCube = useCallback((ctx: CanvasRenderingContext2D, centerX: number, centerY: number, size: number, bass: number, highs: number, colors: typeof colorSchemes[0]) => {
-    const wobble = 1 + (bass / 255) * 0.12;
-    const pulse = 1 + (highs / 255) * 0.08;
+    const wobble = 1 + (bass / 255) * 0.18;
+    const pulse = 1 + (highs / 255) * 0.12;
+    const breathe = Math.sin(breatheRef.current * 0.8) * 0.12 + 1;
     
     ctx.save();
     ctx.translate(centerX, centerY);
-    ctx.rotate(rotationRef.current * 0.03);
+    ctx.rotate(rotationRef.current * 0.06);
     
     ctx.lineWidth = 1.5;
     
-    // Outer hexagon
+    // Outer hexagon with pulsing vertices
     ctx.beginPath();
     for (let i = 0; i < 6; i++) {
-      const angle = (Math.PI / 3) * i;
-      const x = size * wobble * Math.cos(angle);
-      const y = size * wobble * Math.sin(angle);
+      const baseAngle = (Math.PI / 3) * i;
+      const vertexPulse = 1 + Math.sin(orbitRef.current * 2 + i) * 0.08;
+      const angle = baseAngle + Math.sin(breatheRef.current + i * 0.5) * 0.05;
+      const x = size * wobble * vertexPulse * Math.cos(angle);
+      const y = size * wobble * vertexPulse * Math.sin(angle);
       if (i === 0) ctx.moveTo(x, y);
       else ctx.lineTo(x, y);
     }
@@ -158,45 +189,58 @@ const SacredGeometryVisualizer = ({ analyser, isPlaying, currentTrack }: SacredG
     ctx.globalAlpha = 0.7 + (highs / 255) * 0.3;
     ctx.stroke();
     
-    // Inner hexagon
+    // Inner hexagon with counter-rotation
+    ctx.save();
+    ctx.rotate(-rotation2Ref.current * 0.1);
     ctx.beginPath();
     for (let i = 0; i < 6; i++) {
-      const angle = (Math.PI / 3) * i + Math.PI / 6;
-      const x = size * 0.5 * wobble * Math.cos(angle);
-      const y = size * 0.5 * wobble * Math.sin(angle);
+      const baseAngle = (Math.PI / 3) * i + Math.PI / 6;
+      const vertexPulse = 1 + Math.sin(orbitRef.current * 2.5 + i) * 0.1;
+      const x = size * 0.5 * wobble * vertexPulse * breathe * Math.cos(baseAngle);
+      const y = size * 0.5 * wobble * vertexPulse * breathe * Math.sin(baseAngle);
       if (i === 0) ctx.moveTo(x, y);
       else ctx.lineTo(x, y);
     }
     ctx.closePath();
     ctx.strokeStyle = colors.secondary;
     ctx.stroke();
+    ctx.restore();
     
-    // 13 circles (nodes of Metatron's Cube)
-    const nodes: {x: number, y: number}[] = [{ x: 0, y: 0 }];
+    // 13 circles (nodes of Metatron's Cube) with orbital motion
+    const nodes: {x: number, y: number, scale: number}[] = [{ x: 0, y: 0, scale: 1 + Math.sin(breatheRef.current) * 0.2 }];
     
-    // Inner ring
+    // Inner ring with individual orbits
     for (let i = 0; i < 6; i++) {
-      const angle = (Math.PI / 3) * i;
+      const baseAngle = (Math.PI / 3) * i;
+      const orbitOffset = Math.sin(orbitRef.current * 1.5 + i * 0.8) * 0.15;
+      const angle = baseAngle + rotation2Ref.current * 0.08;
+      const dist = size * (0.5 + orbitOffset) * wobble;
       nodes.push({
-        x: size * 0.5 * wobble * Math.cos(angle),
-        y: size * 0.5 * wobble * Math.sin(angle)
+        x: dist * Math.cos(angle),
+        y: dist * Math.sin(angle),
+        scale: 1 + Math.sin(breatheRef.current + i) * 0.15
       });
     }
     
-    // Outer ring
+    // Outer ring with wave motion
     for (let i = 0; i < 6; i++) {
-      const angle = (Math.PI / 3) * i;
+      const baseAngle = (Math.PI / 3) * i;
+      const waveOffset = Math.sin(orbitRef.current + i * 0.6) * 0.12;
+      const angle = baseAngle - rotation3Ref.current * 0.04;
+      const dist = size * (1 + waveOffset) * wobble;
       nodes.push({
-        x: size * wobble * Math.cos(angle),
-        y: size * wobble * Math.sin(angle)
+        x: dist * Math.cos(angle),
+        y: dist * Math.sin(angle),
+        scale: 1 + Math.sin(breatheRef.current * 1.2 + i) * 0.12
       });
     }
     
-    // Draw all connecting lines
+    // Draw all connecting lines with animated opacity
     ctx.strokeStyle = colors.primary;
-    ctx.globalAlpha = 0.3 + (highs / 255) * 0.2;
     for (let i = 0; i < nodes.length; i++) {
       for (let j = i + 1; j < nodes.length; j++) {
+        const lineAlpha = 0.2 + Math.sin(orbitRef.current + i + j) * 0.1 + (highs / 255) * 0.2;
+        ctx.globalAlpha = lineAlpha;
         ctx.beginPath();
         ctx.moveTo(nodes[i].x, nodes[i].y);
         ctx.lineTo(nodes[j].x, nodes[j].y);
@@ -204,9 +248,9 @@ const SacredGeometryVisualizer = ({ analyser, isPlaying, currentTrack }: SacredG
       }
     }
     
-    // Draw circles at nodes
-    const circleRadius = size * 0.08 * pulse;
+    // Draw circles at nodes with individual pulsing
     nodes.forEach((node, i) => {
+      const circleRadius = size * 0.08 * pulse * node.scale;
       ctx.beginPath();
       ctx.arc(node.x, node.y, circleRadius, 0, Math.PI * 2);
       ctx.strokeStyle = i === 0 ? colors.accent : (i <= 6 ? colors.secondary : colors.primary);
@@ -217,65 +261,78 @@ const SacredGeometryVisualizer = ({ analyser, isPlaying, currentTrack }: SacredG
     ctx.restore();
   }, []);
 
-  // Track 3: Sri Yantra - interlocking triangles
+  // Track 3: Sri Yantra - interlocking triangles with enhanced motion
   const drawSriYantra = useCallback((ctx: CanvasRenderingContext2D, centerX: number, centerY: number, size: number, bass: number, highs: number, colors: typeof colorSchemes[0]) => {
-    const wobble = 1 + (bass / 255) * 0.1;
-    const pulse = 1 + (highs / 255) * 0.08;
+    const wobble = 1 + (bass / 255) * 0.15;
+    const pulse = 1 + (highs / 255) * 0.12;
+    const breathe = Math.sin(breatheRef.current * 0.7) * 0.1 + 1;
     
     ctx.save();
     ctx.translate(centerX, centerY);
-    ctx.rotate(rotationRef.current * 0.02);
+    ctx.rotate(rotationRef.current * 0.04);
     
     ctx.lineWidth = 1.5;
     
-    // Draw 9 interlocking triangles
+    // Draw 9 interlocking triangles with individual motion
     const triangleSizes = [1, 0.85, 0.7, 0.55, 0.4];
     
     triangleSizes.forEach((scale, index) => {
-      const s = size * scale * wobble;
+      const layerBreath = Math.sin(breatheRef.current + index * 0.5) * 0.08 + 1;
+      const s = size * scale * wobble * layerBreath;
       
-      // Upward triangle
+      // Upward triangle with rotation
+      ctx.save();
+      ctx.rotate(Math.sin(orbitRef.current + index) * 0.05);
       ctx.beginPath();
-      ctx.moveTo(0, -s * pulse);
+      const upPulse = pulse * (1 + Math.sin(orbitRef.current * 2 + index) * 0.08);
+      ctx.moveTo(0, -s * upPulse);
       ctx.lineTo(-s * 0.866, s * 0.5);
       ctx.lineTo(s * 0.866, s * 0.5);
       ctx.closePath();
       ctx.strokeStyle = colors.primary;
-      ctx.globalAlpha = 0.5 + (highs / 255) * 0.3 - index * 0.08;
+      ctx.globalAlpha = 0.5 + (highs / 255) * 0.3 - index * 0.06;
       ctx.stroke();
+      ctx.restore();
       
-      // Downward triangle (offset)
+      // Downward triangle (offset) with counter-rotation
       if (index < 4) {
-        const s2 = size * (scale - 0.1) * wobble;
+        ctx.save();
+        ctx.rotate(-Math.sin(orbitRef.current * 1.2 + index) * 0.06);
+        const s2 = size * (scale - 0.1) * wobble * breathe;
+        const downPulse = pulse * (1 + Math.sin(orbitRef.current * 2.5 + index) * 0.08);
         ctx.beginPath();
-        ctx.moveTo(0, s2 * pulse);
+        ctx.moveTo(0, s2 * downPulse);
         ctx.lineTo(-s2 * 0.866, -s2 * 0.5);
         ctx.lineTo(s2 * 0.866, -s2 * 0.5);
         ctx.closePath();
         ctx.strokeStyle = colors.secondary;
         ctx.stroke();
+        ctx.restore();
       }
     });
     
-    // Central bindu (dot)
+    // Central bindu (dot) with pulsing
+    const binduSize = size * 0.03 * pulse * (1 + Math.sin(breatheRef.current * 2) * 0.3);
     ctx.beginPath();
-    ctx.arc(0, 0, size * 0.03 * pulse, 0, Math.PI * 2);
+    ctx.arc(0, 0, binduSize, 0, Math.PI * 2);
     ctx.strokeStyle = colors.accent;
     ctx.globalAlpha = 0.9;
     ctx.stroke();
     
-    // Outer circle
+    // Outer circle with breathing
     ctx.beginPath();
-    ctx.arc(0, 0, size * 1.15 * wobble, 0, Math.PI * 2);
+    ctx.arc(0, 0, size * 1.15 * wobble * breathe, 0, Math.PI * 2);
     ctx.strokeStyle = colors.primary;
     ctx.globalAlpha = 0.4 + (highs / 255) * 0.2;
     ctx.stroke();
     
-    // Lotus petals (16)
+    // Lotus petals (16) with wave motion
     for (let i = 0; i < 16; i++) {
-      const angle = (Math.PI / 8) * i;
-      const innerR = size * 1.2 * wobble;
-      const outerR = size * 1.4 * wobble;
+      const baseAngle = (Math.PI / 8) * i;
+      const angle = baseAngle + rotation2Ref.current * 0.05;
+      const petalWave = Math.sin(orbitRef.current * 1.5 + i * 0.4) * 0.1;
+      const innerR = size * (1.2 + petalWave) * wobble;
+      const outerR = size * (1.4 + petalWave * 1.5) * wobble;
       
       ctx.beginPath();
       ctx.moveTo(innerR * Math.cos(angle - 0.1), innerR * Math.sin(angle - 0.1));
@@ -284,7 +341,26 @@ const SacredGeometryVisualizer = ({ analyser, isPlaying, currentTrack }: SacredG
         innerR * Math.cos(angle + 0.1), innerR * Math.sin(angle + 0.1)
       );
       ctx.strokeStyle = colors.secondary;
-      ctx.globalAlpha = 0.3 + (highs / 255) * 0.2;
+      ctx.globalAlpha = 0.3 + (highs / 255) * 0.2 + Math.sin(orbitRef.current + i) * 0.1;
+      ctx.stroke();
+    }
+    
+    // Second ring of petals with counter-rotation
+    for (let i = 0; i < 16; i++) {
+      const baseAngle = (Math.PI / 8) * i + Math.PI / 16;
+      const angle = baseAngle - rotation3Ref.current * 0.03;
+      const petalWave = Math.sin(orbitRef.current * 1.2 + i * 0.3) * 0.08;
+      const innerR = size * (1.45 + petalWave) * wobble;
+      const outerR = size * (1.65 + petalWave) * wobble;
+      
+      ctx.beginPath();
+      ctx.moveTo(innerR * Math.cos(angle - 0.08), innerR * Math.sin(angle - 0.08));
+      ctx.quadraticCurveTo(
+        outerR * Math.cos(angle), outerR * Math.sin(angle),
+        innerR * Math.cos(angle + 0.08), innerR * Math.sin(angle + 0.08)
+      );
+      ctx.strokeStyle = colors.primary;
+      ctx.globalAlpha = 0.25 + (highs / 255) * 0.15;
       ctx.stroke();
     }
     
@@ -378,8 +454,13 @@ const SacredGeometryVisualizer = ({ analyser, isPlaying, currentTrack }: SacredG
     // Draw tetrahedron flash on snare/clap
     drawTetrahedronFlash(ctx, centerX, centerY, baseSize * 0.8, tetraFlashRef.current);
 
-    // Update rotation based on bass
-    rotationRef.current += 0.005 + (bass / 255) * 0.01;
+    // Update rotations based on bass - multiple rotation speeds
+    const bassIntensity = bass / 255;
+    rotationRef.current += 0.012 + bassIntensity * 0.02;
+    rotation2Ref.current += 0.008 + bassIntensity * 0.015;
+    rotation3Ref.current += 0.005 + bassIntensity * 0.01;
+    breatheRef.current += 0.03 + bassIntensity * 0.02;
+    orbitRef.current += 0.025 + bassIntensity * 0.03;
     timeRef.current += 16;
     lastBassRef.current = bass;
     
