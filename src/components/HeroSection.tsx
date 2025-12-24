@@ -82,20 +82,6 @@ const HeroSection = () => {
           </p>
         </motion.div>
 
-        {/* CTA Buttons */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 1.2 }}
-          className="flex flex-col sm:flex-row gap-4 justify-center mb-16"
-        >
-          <Button variant="sacred" size="xl">
-            Enter the Frequency Chamber
-          </Button>
-          <Button variant="hermetic" size="xl">
-            Explore the Apothecary
-          </Button>
-        </motion.div>
 
         {/* Hermetic Seal */}
         <motion.div
