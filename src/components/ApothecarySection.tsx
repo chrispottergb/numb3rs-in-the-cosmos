@@ -1,9 +1,13 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Download, Disc, Shirt, ShoppingBag } from "lucide-react";
+import { Download, Disc, ShoppingBag } from "lucide-react";
 import lapisLazuliImg from "@/assets/lapis-lazuli-crystal.png";
 import seleniteImg from "@/assets/selenite-crystal.png";
 import blackTourmalineImg from "@/assets/black-tourmaline-crystal.png";
+import protectionHoodieImg from "@/assets/protection-hoodie.png";
+import protectionJacketImg from "@/assets/protection-jacket.png";
+import protectionHatImg from "@/assets/protection-hat.png";
+import raiment369Img from "@/assets/369-raiment.png";
 
 const losslessArchive = [
   {
@@ -52,11 +56,34 @@ const toolkit = [
   {
     id: 6,
     name: "The 3-6-9 Raiment",
-    description: "Protective clothing featuring the Sigil of Hermes to shield the wearer's aura from external frequency interference.",
+    description: "Ceremonial garment featuring Tesla's divine numbers to align the wearer with universal frequency.",
     frequency: "Sacred Protection",
-    image: null,
-    icon: Shirt,
+    image: raiment369Img,
     color: "accent",
+  },
+  {
+    id: 7,
+    name: "Sigil Hoodie",
+    description: "Premium hoodie with embroidered protection sigils. Shields your aura during daily activities.",
+    frequency: "Sacred Protection",
+    image: protectionHoodieImg,
+    color: "primary",
+  },
+  {
+    id: 8,
+    name: "Winter Guardian Jacket",
+    description: "Insulated winter jacket featuring the Flower of Life pattern and hermetic protection symbols.",
+    frequency: "Sacred Protection",
+    image: protectionJacketImg,
+    color: "foreground",
+  },
+  {
+    id: 9,
+    name: "Third Eye Beanie",
+    description: "Protective beanie with embroidered all-seeing eye and sacred geometry to guard the crown chakra.",
+    frequency: "Sacred Protection",
+    image: protectionHatImg,
+    color: "muted-foreground",
   },
 ];
 
@@ -150,23 +177,13 @@ const ApothecarySection = () => {
                 whileHover={{ scale: 1.05, y: -10 }}
                 className="group border-hermetic rounded-xl p-6 bg-card/50 backdrop-blur-sm hover:bg-card/80 transition-all duration-300 text-center"
               >
-                {item.image ? (
-                  <div className="w-20 h-20 mx-auto mb-4 rounded-full overflow-hidden group-hover:scale-110 transition-transform duration-300">
-                    <img 
-                      src={item.image} 
-                      alt={item.name} 
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                ) : (
-                  <div className={`
-                    w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center
-                    ${item.color === 'accent' ? 'bg-accent/20 text-accent' : 'bg-primary/20 text-primary'}
-                    group-hover:scale-110 transition-transform duration-300
-                  `}>
-                    {item.icon && <item.icon className="h-8 w-8" />}
-                  </div>
-                )}
+                <div className="w-20 h-20 mx-auto mb-4 rounded-full overflow-hidden group-hover:scale-110 transition-transform duration-300">
+                  <img 
+                    src={item.image} 
+                    alt={item.name} 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
                 <h4 className="text-lg font-display text-foreground mb-2">{item.name}</h4>
                 <p className="text-muted-foreground text-sm mb-3">{item.description}</p>
                 <span className={`
