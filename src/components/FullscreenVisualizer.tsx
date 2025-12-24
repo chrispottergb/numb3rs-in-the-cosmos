@@ -1,10 +1,11 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Play, Pause, SkipBack, SkipForward, Volume2, Maximize2, Minimize2, Upload, Music } from 'lucide-react';
+import { X, Play, Pause, SkipBack, SkipForward, Volume2, Maximize2, Minimize2, Upload, Music, Edit2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import SacredGeometryVisualizer from './SacredGeometryVisualizer';
 import AudioUploader from './AudioUploader';
+import TrackEditor from './TrackEditor';
 import WaveformProgress from './WaveformProgress';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { supabase } from '@/integrations/supabase/client';
@@ -57,9 +58,14 @@ interface FullscreenVisualizerProps {
 }
 
 const FullscreenVisualizer = ({ isOpen, onClose }: FullscreenVisualizerProps) => {
-  const [tracks, setTracks] = useState<Track[]>(defaultTracks);
+  const [allTracks, setAllTracks] = useState<Track[]>([]);
   const [showUploader, setShowUploader] = useState(false);
+  const [showEditor, setShowEditor] = useState(false);
+  const [editingTrack, setEditingTrack] = useState<Track | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+
+  // Only pass tracks with actual audio files to the player
+  const playableTracks = useMemo(() => allTracks.filter(t => t.file_url), [allTracks]);
 
   const {
     isPlaying,
@@ -75,7 +81,7 @@ const FullscreenVisualizer = ({ isOpen, onClose }: FullscreenVisualizerProps) =>
     seek,
     setVolume,
     currentTrack,
-  } = useAudioPlayer(tracks.filter(t => t.file_url));
+  } = useAudioPlayer(playableTracks);
 
   const fetchTracks = useCallback(async () => {
     const { data, error } = await supabase
@@ -92,7 +98,7 @@ const FullscreenVisualizer = ({ isOpen, onClose }: FullscreenVisualizerProps) =>
         file_url: t.file_url,
         description: t.description,
       }));
-      setTracks([...dbTracks, ...defaultTracks]);
+      setAllTracks(dbTracks);
     }
   }, []);
 
@@ -121,7 +127,7 @@ const FullscreenVisualizer = ({ isOpen, onClose }: FullscreenVisualizerProps) =>
   }, []);
 
 
-  const hasPlayableTracks = tracks.some(t => t.file_url);
+  const hasPlayableTracks = playableTracks.length > 0;
 
   if (!isOpen) return null;
 
@@ -261,24 +267,44 @@ const FullscreenVisualizer = ({ isOpen, onClose }: FullscreenVisualizerProps) =>
 
             {/* Track list */}
             <div className="mt-8 border-t border-border/30 pt-6">
-              <div className="flex gap-2 overflow-x-auto pb-2">
-                {tracks.map((track, index) => (
-                  <button
-                    key={track.id}
-                    onClick={() => skipTo(index)}
-                    className={`flex-shrink-0 px-4 py-2 rounded-lg transition-all ${
-                      currentTrackIndex === index
-                        ? 'bg-primary/20 border-hermetic text-primary'
-                        : 'bg-muted/30 hover:bg-muted/50 text-muted-foreground'
-                    }`}
-                  >
-                    <span className="font-medium text-sm">{track.title}</span>
-                    {track.frequency && (
-                      <span className="ml-2 text-xs opacity-70">{track.frequency}</span>
-                    )}
-                  </button>
-                ))}
-              </div>
+              <h4 className="text-sm font-medium text-muted-foreground mb-3">Your Tracks</h4>
+              {playableTracks.length === 0 ? (
+                <p className="text-sm text-muted-foreground">No tracks uploaded yet</p>
+              ) : (
+                <div className="flex gap-2 overflow-x-auto pb-2">
+                  {playableTracks.map((track, index) => (
+                    <div
+                      key={track.id}
+                      className={`flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
+                        currentTrackIndex === index
+                          ? 'bg-primary/20 border-hermetic text-primary'
+                          : 'bg-muted/30 hover:bg-muted/50 text-muted-foreground'
+                      }`}
+                    >
+                      <button
+                        onClick={() => skipTo(index)}
+                        className="flex items-center gap-2"
+                      >
+                        <span className="font-medium text-sm">{track.title}</span>
+                        {track.frequency && (
+                          <span className="text-xs opacity-70">{track.frequency}</span>
+                        )}
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingTrack(track);
+                          setShowEditor(true);
+                        }}
+                        className="p-1 hover:bg-primary/20 rounded transition-colors"
+                        title="Edit track"
+                      >
+                        <Edit2 className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </motion.div>
@@ -287,6 +313,17 @@ const FullscreenVisualizer = ({ isOpen, onClose }: FullscreenVisualizerProps) =>
           <AudioUploader
             onUploadComplete={fetchTracks}
             onClose={() => setShowUploader(false)}
+          />
+        )}
+
+        {showEditor && editingTrack && (
+          <TrackEditor
+            track={editingTrack}
+            onSave={fetchTracks}
+            onClose={() => {
+              setShowEditor(false);
+              setEditingTrack(null);
+            }}
           />
         )}
       </motion.div>
