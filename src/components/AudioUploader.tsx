@@ -61,42 +61,28 @@ const AudioUploader = ({ onUploadComplete, onClose }: AudioUploaderProps) => {
     setUploading(true);
     setUploadProgress(0);
 
+    // Simulate progress for better UX
+    const progressInterval = setInterval(() => {
+      setUploadProgress(prev => {
+        if (prev >= 90) {
+          clearInterval(progressInterval);
+          return 90;
+        }
+        return prev + 10;
+      });
+    }, 200);
+
     try {
       const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
 
-      // Use XMLHttpRequest for progress tracking
-      const formData = new FormData();
-      formData.append('file', file);
+      const { error: uploadError } = await supabase.storage
+        .from('audio-tracks')
+        .upload(fileName, file);
 
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      await new Promise<void>((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        
-        xhr.upload.addEventListener('progress', (event) => {
-          if (event.lengthComputable) {
-            const percent = Math.round((event.loaded / event.total) * 100);
-            setUploadProgress(percent);
-          }
-        });
-        
-        xhr.addEventListener('load', () => {
-          if (xhr.status >= 200 && xhr.status < 300) {
-            resolve();
-          } else {
-            reject(new Error(`Upload failed with status ${xhr.status}`));
-          }
-        });
-        
-        xhr.addEventListener('error', () => reject(new Error('Upload failed')));
-        
-        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-        xhr.open('POST', `${supabaseUrl}/storage/v1/object/audio-tracks/${fileName}`);
-        xhr.setRequestHeader('Authorization', `Bearer ${session?.access_token || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`);
-        xhr.setRequestHeader('x-upsert', 'true');
-        xhr.send(file);
-      });
+      if (uploadError) throw uploadError;
+
+      setUploadProgress(95);
 
       const { data: { publicUrl } } = supabase.storage
         .from('audio-tracks')
@@ -113,6 +99,7 @@ const AudioUploader = ({ onUploadComplete, onClose }: AudioUploaderProps) => {
 
       if (insertError) throw insertError;
 
+      setUploadProgress(100);
       toast.success('Track uploaded successfully!');
       onUploadComplete();
       onClose();
@@ -120,6 +107,7 @@ const AudioUploader = ({ onUploadComplete, onClose }: AudioUploaderProps) => {
       console.error('Upload error:', error);
       toast.error('Failed to upload track');
     } finally {
+      clearInterval(progressInterval);
       setUploading(false);
       setUploadProgress(0);
     }
