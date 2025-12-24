@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Play, Pause, Maximize2, Upload } from "lucide-react";
+import { Play, Maximize2, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import FullscreenVisualizer from "./FullscreenVisualizer";
+import AudioUploader from "./AudioUploader";
 import flowerOfLife from "@/assets/flower-of-life.png";
 import metatronsCube from "@/assets/metatrons-cube.png";
 import torusField from "@/assets/torus-field.png";
@@ -33,6 +34,7 @@ const tracks = [
 
 const FrequencyChamber = () => {
   const [showVisualizer, setShowVisualizer] = useState(false);
+  const [showUploader, setShowUploader] = useState(false);
   const [hoveredTrack, setHoveredTrack] = useState<number | null>(null);
 
   return (
@@ -132,7 +134,7 @@ const FrequencyChamber = () => {
             <Button
               variant="hermetic"
               size="xl"
-              onClick={() => setShowVisualizer(true)}
+              onClick={() => setShowUploader(true)}
             >
               <Upload className="h-5 w-5 mr-2" />
               Upload Your Music
@@ -145,6 +147,13 @@ const FrequencyChamber = () => {
         isOpen={showVisualizer}
         onClose={() => setShowVisualizer(false)}
       />
+
+      {showUploader && (
+        <AudioUploader
+          onUploadComplete={() => setShowUploader(false)}
+          onClose={() => setShowUploader(false)}
+        />
+      )}
     </>
   );
 };
