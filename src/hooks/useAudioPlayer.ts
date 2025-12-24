@@ -21,6 +21,10 @@ export const useAudioPlayer = (tracks: Track[]) => {
   const analyserRef = useRef<AnalyserNode | null>(null);
   const sourceRef = useRef<MediaElementAudioSourceNode | null>(null);
 
+  // Use a ref to track the current track count for the ended event
+  const tracksLengthRef = useRef(tracks.length);
+  tracksLengthRef.current = tracks.length;
+
   const initAudio = useCallback(() => {
     if (!audioRef.current) {
       audioRef.current = new Audio();
@@ -35,8 +39,13 @@ export const useAudioPlayer = (tracks: Track[]) => {
       });
       
       audioRef.current.addEventListener('ended', () => {
-        // Auto-play next track
-        setCurrentTrackIndex(prev => (prev + 1) % tracks.length);
+        // Auto-play next track using ref for current track count
+        if (tracksLengthRef.current > 0) {
+          setCurrentTrackIndex(prev => {
+            const nextIndex = (prev + 1) % tracksLengthRef.current;
+            return nextIndex;
+          });
+        }
       });
     }
     
@@ -51,7 +60,7 @@ export const useAudioPlayer = (tracks: Track[]) => {
         analyserRef.current.connect(audioContextRef.current.destination);
       }
     }
-  }, [tracks.length]);
+  }, []);
 
   const loadTrack = useCallback((index: number) => {
     if (!audioRef.current || !tracks[index]) return;
@@ -137,13 +146,17 @@ export const useAudioPlayer = (tracks: Track[]) => {
     }
   }, []);
 
-  // Load initial track
+  // Load track when index changes and auto-play if already playing
   useEffect(() => {
     if (tracks.length > 0) {
       initAudio();
       loadTrack(currentTrackIndex);
+      // Continue playing if we were already playing (for continuous playback)
+      if (isPlaying && audioRef.current) {
+        audioRef.current.play().catch(console.error);
+      }
     }
-  }, [tracks, currentTrackIndex, initAudio, loadTrack]);
+  }, [tracks, currentTrackIndex, initAudio, loadTrack, isPlaying]);
 
   // Cleanup
   useEffect(() => {
