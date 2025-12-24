@@ -216,8 +216,6 @@ const FullscreenVisualizer = ({ isOpen, onClose }: FullscreenVisualizerProps) =>
                   onClick={() => {
                     if (hasAudio) {
                       skipTo(playableIdx);
-                    } else {
-                      setUploadingSlot(index);
                     }
                   }}
                   className={`relative rounded-lg overflow-hidden transition-all ${
@@ -236,11 +234,6 @@ const FullscreenVisualizer = ({ isOpen, onClose }: FullscreenVisualizerProps) =>
                       <Music className="h-6 w-6 text-primary animate-pulse" />
                     </div>
                   )}
-                  {!hasAudio && (
-                    <div className="absolute inset-0 bg-background/60 flex items-center justify-center">
-                      <Upload className="h-6 w-6 text-muted-foreground" />
-                    </div>
-                  )}
                 </motion.button>
                 
                 <div className="text-center max-w-24">
@@ -250,28 +243,6 @@ const FullscreenVisualizer = ({ isOpen, onClose }: FullscreenVisualizerProps) =>
                   <p className="text-xs text-primary/70">
                     {slotTrack?.frequency || defaultSlots[index].frequency}
                   </p>
-                </div>
-                
-                {/* Upload/Delete buttons */}
-                <div className="flex gap-1">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-6 text-xs"
-                    onClick={() => setUploadingSlot(index)}
-                  >
-                    {hasAudio ? 'Replace' : 'Upload'}
-                  </Button>
-                  {hasAudio && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-6 text-xs text-destructive hover:text-destructive"
-                      onClick={() => deleteTrack(slotTrack)}
-                    >
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
-                  )}
                 </div>
               </motion.div>
             );
