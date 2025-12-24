@@ -1,6 +1,9 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Download, Disc, Gem, Shirt, ShoppingBag } from "lucide-react";
+import { Download, Disc, Shirt, ShoppingBag } from "lucide-react";
+import lapisLazuliImg from "@/assets/lapis-lazuli-crystal.png";
+import seleniteImg from "@/assets/selenite-crystal.png";
+import blackTourmalineImg from "@/assets/black-tourmaline-crystal.png";
 
 const losslessArchive = [
   {
@@ -27,7 +30,7 @@ const toolkit = [
     name: "Lapis Lazuli",
     description: "Charged at 528Hz during the Numb3rs master sessions. Enhances truth and inner wisdom.",
     frequency: "528Hz Charged",
-    icon: Gem,
+    image: lapisLazuliImg,
     color: "primary",
   },
   {
@@ -35,7 +38,7 @@ const toolkit = [
     name: "Selenite",
     description: "Charged at 528Hz during the Numb3rs master sessions. Clears energy blockages and amplifies frequency.",
     frequency: "528Hz Charged",
-    icon: Gem,
+    image: seleniteImg,
     color: "foreground",
   },
   {
@@ -43,7 +46,7 @@ const toolkit = [
     name: "Black Tourmaline",
     description: "Charged at 528Hz during the Numb3rs master sessions. Protection against negative frequencies.",
     frequency: "528Hz Charged",
-    icon: Gem,
+    image: blackTourmalineImg,
     color: "muted-foreground",
   },
   {
@@ -51,6 +54,7 @@ const toolkit = [
     name: "The 3-6-9 Raiment",
     description: "Protective clothing featuring the Sigil of Hermes to shield the wearer's aura from external frequency interference.",
     frequency: "Sacred Protection",
+    image: null,
     icon: Shirt,
     color: "accent",
   },
@@ -146,16 +150,23 @@ const ApothecarySection = () => {
                 whileHover={{ scale: 1.05, y: -10 }}
                 className="group border-hermetic rounded-xl p-6 bg-card/50 backdrop-blur-sm hover:bg-card/80 transition-all duration-300 text-center"
               >
-                <div className={`
-                  w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center
-                  ${item.color === 'primary' ? 'bg-primary/20 text-primary' : ''}
-                  ${item.color === 'foreground' ? 'bg-foreground/10 text-foreground' : ''}
-                  ${item.color === 'muted-foreground' ? 'bg-muted text-muted-foreground' : ''}
-                  ${item.color === 'accent' ? 'bg-accent/20 text-accent' : ''}
-                  group-hover:scale-110 transition-transform duration-300
-                `}>
-                  <item.icon className="h-8 w-8" />
-                </div>
+                {item.image ? (
+                  <div className="w-20 h-20 mx-auto mb-4 rounded-full overflow-hidden group-hover:scale-110 transition-transform duration-300">
+                    <img 
+                      src={item.image} 
+                      alt={item.name} 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div className={`
+                    w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center
+                    ${item.color === 'accent' ? 'bg-accent/20 text-accent' : 'bg-primary/20 text-primary'}
+                    group-hover:scale-110 transition-transform duration-300
+                  `}>
+                    {item.icon && <item.icon className="h-8 w-8" />}
+                  </div>
+                )}
                 <h4 className="text-lg font-display text-foreground mb-2">{item.name}</h4>
                 <p className="text-muted-foreground text-sm mb-3">{item.description}</p>
                 <span className={`
