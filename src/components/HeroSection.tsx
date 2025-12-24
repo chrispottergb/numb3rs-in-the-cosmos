@@ -148,7 +148,7 @@ const HeroSection = () => {
 
       {/* Frequency Chamber Dialog */}
       <Dialog open={showChamber} onOpenChange={setShowChamber}>
-        <DialogContent className="max-w-5xl w-[95vw] max-h-[90vh] overflow-y-auto bg-background/95 backdrop-blur-xl border-hermetic p-6 md:p-8">
+        <DialogContent className="max-w-2xl w-[90vw] max-h-[90vh] overflow-y-auto overflow-x-hidden bg-background/95 backdrop-blur-xl border-hermetic p-4 md:p-6 fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
           {/* Section Header */}
           <div className="text-center mb-8">
             <h2 className="text-3xl md:text-5xl font-display text-gradient-sacred mb-4">
