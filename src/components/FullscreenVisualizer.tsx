@@ -4,7 +4,7 @@ import { X, Play, Pause, SkipBack, SkipForward, Volume2, Maximize2, Minimize2, U
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import SacredGeometryVisualizer from './SacredGeometryVisualizer';
-import AudioUploader from './AudioUploader';
+import TrackSlotUploader from './TrackSlotUploader';
 import TrackEditor from './TrackEditor';
 import WaveformProgress from './WaveformProgress';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
@@ -22,31 +22,22 @@ interface Track {
   description?: string;
 }
 
-// Default tracks with the 3 hero images
-const defaultTracks: Track[] = [
+// Default track slot definitions
+const defaultSlots = [
   { 
-    id: 'default-1', 
     title: "The Spell Breaker", 
     frequency: "528Hz", 
-    duration: "4:32",
-    file_url: "",
-    description: "Hexagonal structure of 528Hz",
+    description: "Track slot 0",
   },
   { 
-    id: 'default-2', 
     title: "Numb3rs in the Cosmos", 
     frequency: "432Hz", 
-    duration: "5:18",
-    file_url: "",
-    description: "Golden Spiral",
+    description: "Track slot 1",
   },
   { 
-    id: 'default-3', 
     title: "Infinity Sign", 
     frequency: "639Hz", 
-    duration: "6:07",
-    file_url: "",
-    description: "Torus field",
+    description: "Track slot 2",
   },
 ];
 
@@ -58,14 +49,15 @@ interface FullscreenVisualizerProps {
 }
 
 const FullscreenVisualizer = ({ isOpen, onClose }: FullscreenVisualizerProps) => {
-  const [allTracks, setAllTracks] = useState<Track[]>([]);
-  const [showUploader, setShowUploader] = useState(false);
+  // Track slots: array of 3, each can be null or a Track
+  const [trackSlots, setTrackSlots] = useState<(Track | null)[]>([null, null, null]);
+  const [uploadingSlot, setUploadingSlot] = useState<number | null>(null);
   const [showEditor, setShowEditor] = useState(false);
   const [editingTrack, setEditingTrack] = useState<Track | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   // Only pass tracks with actual audio files to the player
-  const playableTracks = useMemo(() => allTracks.filter(t => t.file_url), [allTracks]);
+  const playableTracks = useMemo(() => trackSlots.filter((t): t is Track => t !== null && !!t.file_url), [trackSlots]);
 
   const {
     isPlaying,
@@ -87,18 +79,33 @@ const FullscreenVisualizer = ({ isOpen, onClose }: FullscreenVisualizerProps) =>
     const { data, error } = await supabase
       .from('audio_tracks')
       .select('*')
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: true });
 
     if (!error && data) {
-      const dbTracks = data.map(t => ({
-        id: t.id,
-        title: t.title,
-        frequency: t.frequency || '',
-        duration: t.duration || '0:00',
-        file_url: t.file_url,
-        description: t.description,
-      }));
-      setAllTracks(dbTracks);
+      // Map tracks to slots based on description (Track slot 0, Track slot 1, Track slot 2)
+      const newSlots: (Track | null)[] = [null, null, null];
+      
+      data.forEach(t => {
+        const track: Track = {
+          id: t.id,
+          title: t.title,
+          frequency: t.frequency || '',
+          duration: t.duration || '0:00',
+          file_url: t.file_url,
+          description: t.description || undefined,
+        };
+        
+        // Parse slot index from description
+        const match = t.description?.match(/Track slot (\d+)/);
+        if (match) {
+          const slotIndex = parseInt(match[1], 10);
+          if (slotIndex >= 0 && slotIndex < 3) {
+            newSlots[slotIndex] = track;
+          }
+        }
+      });
+      
+      setTrackSlots(newSlots);
     }
   }, []);
 
@@ -126,8 +133,16 @@ const FullscreenVisualizer = ({ isOpen, onClose }: FullscreenVisualizerProps) =>
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, []);
 
-
   const hasPlayableTracks = playableTracks.length > 0;
+
+  // Get playable index for a slot
+  const getPlayableIndex = (slotIndex: number): number => {
+    let playableIdx = 0;
+    for (let i = 0; i < slotIndex; i++) {
+      if (trackSlots[i] !== null) playableIdx++;
+    }
+    return playableIdx;
+  };
 
   if (!isOpen) return null;
 
@@ -158,30 +173,71 @@ const FullscreenVisualizer = ({ isOpen, onClose }: FullscreenVisualizerProps) =>
           />
         </div>
 
-        {/* Hero Images Display */}
+        {/* Hero Images Display - 3 track slots */}
         <div className="absolute top-8 left-1/2 -translate-x-1/2 flex gap-8 z-10">
-          {trackImages.map((img, index) => (
-            <motion.button
-              key={index}
-              onClick={() => skipTo(index)}
-              className={`relative rounded-lg overflow-hidden transition-all ${
-                currentTrackIndex === index ? 'ring-2 ring-primary scale-110' : 'opacity-60 hover:opacity-100'
-              }`}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <img
-                src={img}
-                alt={defaultTracks[index]?.title || `Track ${index + 1}`}
-                className="w-20 h-20 md:w-24 md:h-24 object-cover"
-              />
-              {currentTrackIndex === index && isPlaying && (
-                <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
-                  <Music className="h-6 w-6 text-primary animate-pulse" />
+          {trackImages.map((img, index) => {
+            const slotTrack = trackSlots[index];
+            const hasAudio = slotTrack !== null;
+            const playableIdx = hasAudio ? getPlayableIndex(index) : -1;
+            const isCurrentlyPlaying = hasAudio && currentTrackIndex === playableIdx;
+            
+            return (
+              <motion.div
+                key={index}
+                className="flex flex-col items-center gap-2"
+              >
+                <motion.button
+                  onClick={() => {
+                    if (hasAudio) {
+                      skipTo(playableIdx);
+                    } else {
+                      setUploadingSlot(index);
+                    }
+                  }}
+                  className={`relative rounded-lg overflow-hidden transition-all ${
+                    isCurrentlyPlaying ? 'ring-2 ring-primary scale-110' : 'opacity-60 hover:opacity-100'
+                  }`}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <img
+                    src={img}
+                    alt={slotTrack?.title || defaultSlots[index].title}
+                    className="w-20 h-20 md:w-24 md:h-24 object-cover"
+                  />
+                  {isCurrentlyPlaying && isPlaying && (
+                    <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
+                      <Music className="h-6 w-6 text-primary animate-pulse" />
+                    </div>
+                  )}
+                  {!hasAudio && (
+                    <div className="absolute inset-0 bg-background/60 flex items-center justify-center">
+                      <Upload className="h-6 w-6 text-muted-foreground" />
+                    </div>
+                  )}
+                </motion.button>
+                
+                <div className="text-center max-w-24">
+                  <p className="text-xs font-medium truncate">
+                    {slotTrack?.title || defaultSlots[index].title}
+                  </p>
+                  <p className="text-xs text-primary/70">
+                    {slotTrack?.frequency || defaultSlots[index].frequency}
+                  </p>
                 </div>
-              )}
-            </motion.button>
-          ))}
+                
+                {/* Upload/Edit button */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 text-xs"
+                  onClick={() => setUploadingSlot(index)}
+                >
+                  {hasAudio ? 'Replace' : 'Upload'}
+                </Button>
+              </motion.div>
+            );
+          })}
         </div>
 
         {/* Track info overlay */}
@@ -194,10 +250,10 @@ const FullscreenVisualizer = ({ isOpen, onClose }: FullscreenVisualizerProps) =>
             {/* Track title */}
             <div className="text-center mb-6">
               <h2 className="text-2xl md:text-4xl font-display text-gradient-sacred mb-2">
-                {currentTrack?.title || defaultTracks[currentTrackIndex]?.title}
+                {currentTrack?.title || defaultSlots[0].title}
               </h2>
               <p className="text-primary text-glow-cyan text-lg">
-                {currentTrack?.frequency || defaultTracks[currentTrackIndex]?.frequency}
+                {currentTrack?.frequency || defaultSlots[0].frequency}
               </p>
             </div>
 
@@ -237,8 +293,8 @@ const FullscreenVisualizer = ({ isOpen, onClose }: FullscreenVisualizerProps) =>
               </Button>
             </div>
 
-            {/* Volume and Upload */}
-            <div className="flex items-center justify-between gap-8">
+            {/* Volume */}
+            <div className="flex items-center justify-center gap-8">
               <div className="flex items-center gap-4 flex-1 max-w-xs">
                 <Volume2 className="h-4 w-4 text-muted-foreground" />
                 <Slider
@@ -248,29 +304,18 @@ const FullscreenVisualizer = ({ isOpen, onClose }: FullscreenVisualizerProps) =>
                   onValueChange={([value]) => setVolume(value / 100)}
                 />
               </div>
-
-              <Button
-                variant="hermetic"
-                size="sm"
-                onClick={() => setShowUploader(true)}
-              >
-                <Upload className="h-4 w-4 mr-2" />
-                Upload Track
-              </Button>
             </div>
 
             {!hasPlayableTracks && (
               <p className="text-center text-muted-foreground mt-4 text-sm">
-                Upload an audio file to start playing
+                Click on a track slot above to upload audio
               </p>
             )}
 
-            {/* Track list */}
-            <div className="mt-8 border-t border-border/30 pt-6">
-              <h4 className="text-sm font-medium text-muted-foreground mb-3">Your Tracks</h4>
-              {playableTracks.length === 0 ? (
-                <p className="text-sm text-muted-foreground">No tracks uploaded yet</p>
-              ) : (
+            {/* Track list with edit buttons */}
+            {hasPlayableTracks && (
+              <div className="mt-8 border-t border-border/30 pt-6">
+                <h4 className="text-sm font-medium text-muted-foreground mb-3">Uploaded Tracks</h4>
                 <div className="flex gap-2 overflow-x-auto pb-2">
                   {playableTracks.map((track, index) => (
                     <div
@@ -304,15 +349,19 @@ const FullscreenVisualizer = ({ isOpen, onClose }: FullscreenVisualizerProps) =>
                     </div>
                   ))}
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </motion.div>
 
-        {showUploader && (
-          <AudioUploader
+        {uploadingSlot !== null && (
+          <TrackSlotUploader
+            slotIndex={uploadingSlot}
+            defaultTitle={defaultSlots[uploadingSlot].title}
+            defaultFrequency={defaultSlots[uploadingSlot].frequency}
+            existingTrack={trackSlots[uploadingSlot]}
             onUploadComplete={fetchTracks}
-            onClose={() => setShowUploader(false)}
+            onClose={() => setUploadingSlot(null)}
           />
         )}
 
