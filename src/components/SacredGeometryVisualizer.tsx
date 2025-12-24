@@ -12,6 +12,8 @@ const SacredGeometryVisualizer = ({ analyser, isPlaying, currentTrack }: SacredG
   const rotationRef = useRef(0);
   const timeRef = useRef(0);
   const hueShiftRef = useRef(0);
+  const lastBassRef = useRef(0);
+  const strobeIntensityRef = useRef(0);
 
   // Color schemes for each track
   const colorSchemes = [
@@ -458,6 +460,120 @@ const SacredGeometryVisualizer = ({ analyser, isPlaying, currentTrack }: SacredG
     ctx.fillRect(0, 0, width, height);
   }, []);
 
+  // Bass strobe with geometric patterns
+  const drawBassStrobe = useCallback((ctx: CanvasRenderingContext2D, width: number, height: number, centerX: number, centerY: number, frequencyData: Uint8Array) => {
+    // Calculate bass intensity (first 16 frequency bins are sub-bass/bass)
+    const bassFreq = Array.from(frequencyData.slice(0, 16)).reduce((a, b) => a + b, 0) / 16;
+    const subBass = Array.from(frequencyData.slice(0, 8)).reduce((a, b) => a + b, 0) / 8;
+    
+    // Detect bass hit (sudden increase in bass)
+    const bassDelta = bassFreq - lastBassRef.current;
+    lastBassRef.current = bassFreq;
+    
+    // Trigger strobe on bass hits above threshold
+    if (bassDelta > 30 && bassFreq > 150) {
+      strobeIntensityRef.current = Math.min(1, strobeIntensityRef.current + 0.8);
+    }
+    
+    // Decay strobe intensity
+    strobeIntensityRef.current *= 0.85;
+    
+    if (strobeIntensityRef.current < 0.05) return;
+    
+    const intensity = strobeIntensityRef.current;
+    const hue = (hueShiftRef.current + bassFreq) % 360;
+    
+    ctx.save();
+    ctx.translate(centerX, centerY);
+    
+    // Geometric strobe pattern 1: Expanding hexagon burst
+    const hexCount = 6;
+    for (let h = 0; h < hexCount; h++) {
+      const hexSize = (50 + h * 80) * intensity * (1 + subBass / 255);
+      const hexAlpha = intensity * (1 - h / hexCount) * 0.7;
+      
+      ctx.beginPath();
+      for (let i = 0; i < 6; i++) {
+        const angle = (Math.PI / 3) * i + rotationRef.current * 0.5;
+        const px = hexSize * Math.cos(angle);
+        const py = hexSize * Math.sin(angle);
+        if (i === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.closePath();
+      
+      ctx.strokeStyle = `hsla(${hue + h * 30}, 100%, 70%, ${hexAlpha})`;
+      ctx.lineWidth = 3 + intensity * 4;
+      ctx.shadowBlur = 40 * intensity;
+      ctx.shadowColor = `hsla(${hue + h * 30}, 100%, 60%, ${hexAlpha})`;
+      ctx.stroke();
+    }
+    
+    // Geometric strobe pattern 2: Radiating triangles
+    const triangleCount = 12;
+    for (let t = 0; t < triangleCount; t++) {
+      const angle = (Math.PI * 2 / triangleCount) * t + timeRef.current * 0.002;
+      const dist = 100 + (bassFreq / 255) * 150 * intensity;
+      
+      ctx.save();
+      ctx.rotate(angle);
+      ctx.translate(dist, 0);
+      
+      ctx.beginPath();
+      const triSize = 30 * intensity * (1 + subBass / 500);
+      ctx.moveTo(0, -triSize);
+      ctx.lineTo(triSize * 0.866, triSize * 0.5);
+      ctx.lineTo(-triSize * 0.866, triSize * 0.5);
+      ctx.closePath();
+      
+      const triHue = (hue + t * 30) % 360;
+      ctx.fillStyle = `hsla(${triHue}, 100%, 65%, ${intensity * 0.5})`;
+      ctx.shadowBlur = 25 * intensity;
+      ctx.shadowColor = `hsla(${triHue}, 100%, 60%, 0.8)`;
+      ctx.fill();
+      
+      ctx.restore();
+    }
+    
+    // Geometric strobe pattern 3: Sacred geometry star burst
+    const starPoints = 8;
+    ctx.beginPath();
+    for (let i = 0; i < starPoints * 2; i++) {
+      const angle = (Math.PI / starPoints) * i;
+      const radius = i % 2 === 0 ? 200 * intensity : 100 * intensity;
+      const adjustedRadius = radius * (1 + bassFreq / 400);
+      const px = adjustedRadius * Math.cos(angle + rotationRef.current);
+      const py = adjustedRadius * Math.sin(angle + rotationRef.current);
+      if (i === 0) ctx.moveTo(px, py);
+      else ctx.lineTo(px, py);
+    }
+    ctx.closePath();
+    ctx.strokeStyle = `hsla(${(hue + 180) % 360}, 100%, 80%, ${intensity * 0.6})`;
+    ctx.lineWidth = 2 + intensity * 3;
+    ctx.shadowBlur = 30 * intensity;
+    ctx.shadowColor = `hsla(${(hue + 180) % 360}, 100%, 70%, 0.9)`;
+    ctx.stroke();
+    
+    // Flash overlay for intense bass hits
+    if (intensity > 0.6) {
+      ctx.restore();
+      ctx.save();
+      
+      const flashGradient = ctx.createRadialGradient(
+        centerX, centerY, 0,
+        centerX, centerY, Math.max(width, height) * 0.5
+      );
+      flashGradient.addColorStop(0, `hsla(${hue}, 80%, 90%, ${(intensity - 0.6) * 0.4})`);
+      flashGradient.addColorStop(0.3, `hsla(${hue}, 90%, 60%, ${(intensity - 0.6) * 0.2})`);
+      flashGradient.addColorStop(1, `hsla(${hue}, 100%, 50%, 0)`);
+      
+      ctx.fillStyle = flashGradient;
+      ctx.fillRect(0, 0, width, height);
+    }
+    
+    ctx.restore();
+  }, []);
+
   const animate = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -524,10 +640,13 @@ const SacredGeometryVisualizer = ({ analyser, isPlaying, currentTrack }: SacredG
       drawFrequencyBars(ctx, centerX, centerY, baseSize + 50, frequencyData, colors);
     }
 
+    // Draw bass strobe effect on top of everything
+    drawBassStrobe(ctx, width, height, centerX, centerY, frequencyData);
+
     rotationRef.current += 0.015 + (avgFreq / 255) * 0.01;
     timeRef.current += 16;
     animationRef.current = requestAnimationFrame(animate);
-  }, [analyser, isPlaying, currentTrack, colorSchemes, drawFlowerOfLife, drawMetatronsCube, drawTorus, drawGoldenSpiral, drawFrequencyBars, drawParticles, drawKaleidoscope, drawWarpTunnel, drawEnergyWaves, drawFractalSpirals, drawPsychedelicBackground]);
+  }, [analyser, isPlaying, currentTrack, colorSchemes, drawFlowerOfLife, drawMetatronsCube, drawTorus, drawGoldenSpiral, drawFrequencyBars, drawParticles, drawKaleidoscope, drawWarpTunnel, drawEnergyWaves, drawFractalSpirals, drawPsychedelicBackground, drawBassStrobe]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
