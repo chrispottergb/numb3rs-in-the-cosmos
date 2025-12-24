@@ -87,11 +87,21 @@ const HeroSection = () => {
             />
           </motion.div>
 
+          {/* Album Title */}
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+            className="text-xl md:text-2xl lg:text-3xl font-display text-gradient-sacred tracking-wider mb-4"
+          >
+            NUMB3RS IN THE COSMOS
+          </motion.h2>
+
           {/* Square Nav Button to Frequency Chamber */}
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
+            transition={{ duration: 0.8, delay: 0.7 }}
             className="relative w-40 h-40 md:w-56 md:h-56 lg:w-64 lg:h-64 mx-auto mb-8"
           >
             {/* Pulsing glow effect */}
@@ -125,21 +135,11 @@ const HeroSection = () => {
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.8 }}
-            className="font-display mb-4"
+            transition={{ duration: 0.8, delay: 0.9 }}
+            className="font-display"
           >
             <span className="text-gradient-sacred text-2xl md:text-3xl lg:text-4xl">DR. POTTER, DMA</span>
           </motion.h1>
-
-          {/* Album Title */}
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.9 }}
-            className="text-xl md:text-2xl lg:text-3xl font-display text-gradient-sacred tracking-wider"
-          >
-            NUMB3RS IN THE COSMOS
-          </motion.h2>
         </div>
 
         {/* Bottom fade */}
