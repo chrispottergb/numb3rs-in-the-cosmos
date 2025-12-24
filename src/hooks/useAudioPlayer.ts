@@ -57,12 +57,23 @@ export const useAudioPlayer = (tracks: Track[]) => {
     if (!audioRef.current || !tracks[index]) return;
     
     const track = tracks[index];
+    if (!track.file_url) {
+      console.warn('Track has no file_url:', track.title);
+      return;
+    }
+    
+    console.log('Loading track:', track.title, track.file_url);
     audioRef.current.src = track.file_url;
     audioRef.current.load();
     setCurrentTime(0);
   }, [tracks]);
 
   const play = useCallback(async () => {
+    if (tracks.length === 0) {
+      console.warn('No tracks available to play');
+      return;
+    }
+    
     initAudio();
     
     if (audioContextRef.current?.state === 'suspended') {
@@ -70,11 +81,16 @@ export const useAudioPlayer = (tracks: Track[]) => {
     }
     
     if (audioRef.current) {
-      if (!audioRef.current.src && tracks[currentTrackIndex]) {
+      if (!audioRef.current.src || audioRef.current.src === window.location.href) {
         loadTrack(currentTrackIndex);
       }
-      await audioRef.current.play();
-      setIsPlaying(true);
+      try {
+        await audioRef.current.play();
+        setIsPlaying(true);
+        console.log('Playback started');
+      } catch (error) {
+        console.error('Playback failed:', error);
+      }
     }
   }, [initAudio, tracks, currentTrackIndex, loadTrack]);
 
