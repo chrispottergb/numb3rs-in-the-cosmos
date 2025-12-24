@@ -109,7 +109,7 @@ const HeroSection = () => {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.7 }}
-            className="relative w-24 h-24 md:w-32 md:h-32 mx-auto"
+            className="relative w-40 h-40 md:w-56 md:h-56 lg:w-64 lg:h-64 mx-auto"
           >
             {/* Pulsing glow effect */}
             <motion.div
