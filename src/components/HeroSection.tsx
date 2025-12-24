@@ -141,7 +141,7 @@ const HeroSection = () => {
                   className="relative group cursor-pointer"
                   onMouseEnter={() => setHoveredTrack(index)}
                   onMouseLeave={() => setHoveredTrack(null)}
-                  onClick={() => setShowVisualizer(true)}
+                  onClick={() => { setShowVisualizer(true); setShowChamber(false); }}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
@@ -181,7 +181,7 @@ const HeroSection = () => {
             <Button
               variant="sacred"
               size="default"
-              onClick={() => setShowVisualizer(true)}
+              onClick={() => { setShowVisualizer(true); setShowChamber(false); }}
             >
               <Maximize2 className="h-4 w-4 mr-2" />
               Fullscreen Visualizer
