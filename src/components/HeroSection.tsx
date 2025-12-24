@@ -160,52 +160,51 @@ const HeroSection = () => {
           </div>
 
           {/* 3 Hero Images Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-2 max-w-2xl mx-auto mb-8">
-            {tracks.map((track, index) => (
-              <motion.div
-                key={track.id}
-                className="relative group cursor-pointer"
-                onMouseEnter={() => setHoveredTrack(index)}
-                onMouseLeave={() => setHoveredTrack(null)}
-                onClick={() => setShowVisualizer(true)}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <div className="relative aspect-square rounded-xl overflow-hidden border-hermetic bg-card/50 backdrop-blur-sm">
-                  <img
-                    src={track.image}
-                    alt={track.title}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                  
-                  {/* Overlay */}
-                  <div className={`absolute inset-0 bg-background/60 transition-opacity duration-300 ${
-                    hoveredTrack === index ? 'opacity-100' : 'opacity-0'
-                  }`}>
-                    <div className="absolute inset-0 flex flex-col items-center justify-center">
-                      <Play className="h-10 w-10 text-primary mb-3" />
-                      <span className="text-primary font-display text-lg">Enter Chamber</span>
+          <div className="flex justify-center mb-8">
+            <div className="grid grid-cols-3 gap-3 w-full max-w-md">
+              {tracks.map((track, index) => (
+                <motion.div
+                  key={track.id}
+                  className="relative group cursor-pointer"
+                  onMouseEnter={() => setHoveredTrack(index)}
+                  onMouseLeave={() => setHoveredTrack(null)}
+                  onClick={() => setShowVisualizer(true)}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <div className="relative aspect-square rounded-lg overflow-hidden border-hermetic bg-card/50 backdrop-blur-sm">
+                    <img
+                      src={track.image}
+                      alt={track.title}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                    
+                    {/* Overlay */}
+                    <div className={`absolute inset-0 bg-background/60 transition-opacity duration-300 ${
+                      hoveredTrack === index ? 'opacity-100' : 'opacity-0'
+                    }`}>
+                      <div className="absolute inset-0 flex flex-col items-center justify-center">
+                        <Play className="h-6 w-6 text-primary mb-1" />
+                        <span className="text-primary font-display text-xs">Play</span>
+                      </div>
                     </div>
+
+                    {/* Glow effect */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent pointer-events-none" />
                   </div>
 
-                  {/* Glow effect */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent pointer-events-none" />
-                </div>
-
-                {/* Track info */}
-                <div className="mt-3 text-center">
-                  <h3 className="text-lg font-display text-foreground mb-1">
-                    {track.title}
-                  </h3>
-                  <p className="text-primary text-glow-cyan">
-                    {track.frequency}
-                  </p>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {track.description}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
+                  {/* Track info */}
+                  <div className="mt-2 text-center">
+                    <h3 className="text-sm font-display text-foreground mb-0.5">
+                      {track.title}
+                    </h3>
+                    <p className="text-primary text-glow-cyan text-xs">
+                      {track.frequency}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
           </div>
 
           {/* CTA Buttons */}
