@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Download, Disc, ShoppingBag } from "lucide-react";
+import ApparelProductCard from "@/components/ApparelProductCard";
 import lapisLazuliImg from "@/assets/lapis-lazuli-crystal.png";
 import seleniteImg from "@/assets/selenite-crystal.png";
 import blackTourmalineImg from "@/assets/black-tourmaline-crystal.png";
@@ -41,6 +42,7 @@ const crystals = [
     description: "Charged at 528Hz during the Numb3rs master sessions. Enhances truth and inner wisdom.",
     frequency: "528Hz Charged",
     image: lapisLazuliImg,
+    price: "$44.44",
   },
   {
     id: 4,
@@ -48,6 +50,7 @@ const crystals = [
     description: "Charged at 528Hz during the Numb3rs master sessions. Clears energy blockages and amplifies frequency.",
     frequency: "528Hz Charged",
     image: seleniteImg,
+    price: "$44.44",
   },
   {
     id: 5,
@@ -55,6 +58,7 @@ const crystals = [
     description: "Charged at 528Hz during the Numb3rs master sessions. Protection against negative frequencies.",
     frequency: "528Hz Charged",
     image: blackTourmalineImg,
+    price: "$44.44",
   },
 ];
 
@@ -65,6 +69,8 @@ const hoodies = [
     description: "Premium hoodie featuring the Staff of Hermes with serpent wisdom and sacred geometry sleeve art.",
     frequency: "Sacred Protection",
     image: hoodieBlackImg,
+    price: "$88.88",
+    sizes: ["S", "M", "L", "XL", "2XL"],
   },
   {
     id: 7,
@@ -72,6 +78,8 @@ const hoodies = [
     description: "Premium hoodie featuring the Staff of Hermes with golden serpent design and hermetic symbols.",
     frequency: "Sacred Protection",
     image: hoodieNavyImg,
+    price: "$88.88",
+    sizes: ["S", "M", "L", "XL", "2XL"],
   },
   {
     id: 8,
@@ -79,6 +87,8 @@ const hoodies = [
     description: "Premium hoodie featuring the Staff of Hermes with detailed alchemical annotations.",
     frequency: "Sacred Protection",
     image: hoodieOrangeImg,
+    price: "$88.88",
+    sizes: ["S", "M", "L", "XL", "2XL"],
   },
   {
     id: 9,
@@ -86,6 +96,8 @@ const hoodies = [
     description: "Premium hoodie featuring the Staff of Hermes with subtle protective sigil artwork.",
     frequency: "Sacred Protection",
     image: hoodieGrayImg,
+    price: "$88.88",
+    sizes: ["S", "M", "L", "XL", "2XL"],
   },
 ];
 
@@ -96,6 +108,8 @@ const jackets = [
     description: "Insulated winter jacket with full caduceus embroidery and hermetic sleeve symbols.",
     frequency: "Sacred Protection",
     image: jacketBlackImg,
+    price: "$144.44",
+    sizes: ["S", "M", "L", "XL", "2XL"],
   },
   {
     id: 11,
@@ -103,6 +117,8 @@ const jackets = [
     description: "Insulated winter jacket with orange-gold caduceus design and sacred geometry accents.",
     frequency: "Sacred Protection",
     image: jacketNavyImg,
+    price: "$144.44",
+    sizes: ["S", "M", "L", "XL", "2XL"],
   },
   {
     id: 12,
@@ -110,6 +126,8 @@ const jackets = [
     description: "Insulated winter jacket with silver-white caduceus embroidery and alchemical symbols.",
     frequency: "Sacred Protection",
     image: jacketRedImg,
+    price: "$144.44",
+    sizes: ["S", "M", "L", "XL", "2XL"],
   },
 ];
 
@@ -120,6 +138,8 @@ const beanies = [
     description: "Protective beanie with embroidered triangle sigil and concentric circle design.",
     frequency: "Crown Chakra Shield",
     image: beanieOrangeImg,
+    price: "$33.33",
+    sizes: ["One Size"],
   },
   {
     id: 14,
@@ -127,6 +147,8 @@ const beanies = [
     description: "Protective beanie with embroidered triangle sigil and concentric circle design.",
     frequency: "Crown Chakra Shield",
     image: beanieWhiteImg,
+    price: "$33.33",
+    sizes: ["One Size"],
   },
 ];
 
@@ -232,9 +254,12 @@ const ApothecarySection = () => {
                 <span className="text-xs font-medium tracking-wider text-primary">
                   {item.frequency}
                 </span>
-                <Button variant="hermetic" size="sm" className="w-full mt-4">
+                <div className="mt-3 mb-4">
+                  <span className="text-xl font-display text-accent text-glow-gold">{item.price}</span>
+                </div>
+                <Button variant="hermetic" size="sm" className="w-full">
                   <ShoppingBag className="mr-2 h-4 w-4" />
-                  Select
+                  Add to Cart
                 </Button>
               </motion.div>
             ))}
@@ -254,32 +279,7 @@ const ApothecarySection = () => {
           
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
             {hoodies.map((item, index) => (
-              <motion.div
-                key={item.id}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.1 * index }}
-                whileHover={{ scale: 1.05, y: -10 }}
-                className="group border-hermetic rounded-xl p-4 bg-card/50 backdrop-blur-sm hover:bg-card/80 transition-all duration-300 text-center"
-              >
-                <div className="aspect-square w-full mb-4 rounded-lg overflow-hidden group-hover:scale-105 transition-transform duration-300">
-                  <img 
-                    src={item.image} 
-                    alt={item.name} 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <h4 className="text-base font-display text-foreground mb-2">{item.name}</h4>
-                <p className="text-muted-foreground text-xs mb-3">{item.description}</p>
-                <span className="text-xs font-medium tracking-wider text-accent">
-                  {item.frequency}
-                </span>
-                <Button variant="hermetic" size="sm" className="w-full mt-4">
-                  <ShoppingBag className="mr-2 h-4 w-4" />
-                  Select
-                </Button>
-              </motion.div>
+              <ApparelProductCard key={item.id} item={item} index={index} />
             ))}
           </div>
         </motion.div>
@@ -297,32 +297,7 @@ const ApothecarySection = () => {
           
           <div className="grid sm:grid-cols-3 gap-6 mb-16">
             {jackets.map((item, index) => (
-              <motion.div
-                key={item.id}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.1 * index }}
-                whileHover={{ scale: 1.05, y: -10 }}
-                className="group border-hermetic rounded-xl p-4 bg-card/50 backdrop-blur-sm hover:bg-card/80 transition-all duration-300 text-center"
-              >
-                <div className="aspect-square w-full mb-4 rounded-lg overflow-hidden group-hover:scale-105 transition-transform duration-300">
-                  <img 
-                    src={item.image} 
-                    alt={item.name} 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <h4 className="text-base font-display text-foreground mb-2">{item.name}</h4>
-                <p className="text-muted-foreground text-xs mb-3">{item.description}</p>
-                <span className="text-xs font-medium tracking-wider text-accent">
-                  {item.frequency}
-                </span>
-                <Button variant="hermetic" size="sm" className="w-full mt-4">
-                  <ShoppingBag className="mr-2 h-4 w-4" />
-                  Select
-                </Button>
-              </motion.div>
+              <ApparelProductCard key={item.id} item={item} index={index} />
             ))}
           </div>
         </motion.div>
@@ -340,32 +315,7 @@ const ApothecarySection = () => {
           
           <div className="grid sm:grid-cols-2 gap-6 max-w-2xl mx-auto">
             {beanies.map((item, index) => (
-              <motion.div
-                key={item.id}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.1 * index }}
-                whileHover={{ scale: 1.05, y: -10 }}
-                className="group border-hermetic rounded-xl p-4 bg-card/50 backdrop-blur-sm hover:bg-card/80 transition-all duration-300 text-center"
-              >
-                <div className="aspect-square w-full mb-4 rounded-lg overflow-hidden group-hover:scale-105 transition-transform duration-300">
-                  <img 
-                    src={item.image} 
-                    alt={item.name} 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <h4 className="text-base font-display text-foreground mb-2">{item.name}</h4>
-                <p className="text-muted-foreground text-xs mb-3">{item.description}</p>
-                <span className="text-xs font-medium tracking-wider text-accent">
-                  {item.frequency}
-                </span>
-                <Button variant="hermetic" size="sm" className="w-full mt-4">
-                  <ShoppingBag className="mr-2 h-4 w-4" />
-                  Select
-                </Button>
-              </motion.div>
+              <ApparelProductCard key={item.id} item={item} index={index} />
             ))}
           </div>
         </motion.div>
