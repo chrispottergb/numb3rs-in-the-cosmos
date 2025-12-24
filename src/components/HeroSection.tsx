@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Shield, Play, Maximize2, Upload } from "lucide-react";
+import { Play, Maximize2, Upload } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import FullscreenVisualizer from "./FullscreenVisualizer";
@@ -72,28 +72,6 @@ const HeroSection = () => {
 
         {/* Main content */}
         <div className="relative z-10 container mx-auto px-4 text-center">
-
-          {/* Hermetic Seal - Now at top */}
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            className="border-hermetic rounded-xl p-6 md:p-8 bg-card/50 backdrop-blur-sm max-w-3xl mx-auto mb-12"
-          >
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <Shield className="h-6 w-6 text-accent" />
-              <h3 className="text-lg md:text-xl font-display font-semibold text-accent tracking-wider uppercase">
-                Hermetic Seal
-              </h3>
-              <Shield className="h-6 w-6 text-accent" />
-            </div>
-            <p className="text-muted-foreground text-sm md:text-base leading-relaxed">
-              This space is protected by the <span className="text-primary font-medium">Law of Mentalism</span>. All energy here is encoded with a <span className="text-accent font-medium">3-6-9 barrier</span>. Dark siphoning, parasitic frequency, and energy leaks are neutralized upon entry.
-            </p>
-            <p className="text-primary mt-4 font-display tracking-widest text-sm">
-              As above, so below.
-            </p>
-          </motion.div>
 
           {/* Numb3rs in the Cosmos Banner */}
           <motion.div
