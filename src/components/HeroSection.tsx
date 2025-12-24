@@ -55,11 +55,9 @@ const HeroSection = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.5 }}
-          className="text-4xl md:text-6xl lg:text-7xl font-display mb-4"
+          className="font-display mb-4"
         >
-          <span className="text-gradient-sacred">DR. POTTER, DMA:</span>
-          <br />
-          <span className="text-foreground text-glow-gold">THE SPELL BREAKER</span>
+          <span className="text-gradient-sacred text-2xl md:text-3xl lg:text-4xl">DR. POTTER, DMA</span>
         </motion.h1>
 
         {/* Subtitle */}
