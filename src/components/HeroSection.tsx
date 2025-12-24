@@ -73,27 +73,12 @@ const HeroSection = () => {
         {/* Main content */}
         <div className="relative z-10 container mx-auto px-4 text-center">
 
-          {/* Numb3rs in the Cosmos Banner */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.5 }}
-            className="mb-2 max-w-2xl mx-auto"
-          >
-            <img
-              src={numb3rsBanner}
-              alt="Numb3rs in the Cosmos - Frequency Medicine · Sacred Geometry · Divine Mathematics"
-              className="w-full h-auto rounded-xl"
-            />
-          </motion.div>
-
-
-          {/* Square Nav Button to Frequency Chamber */}
+          {/* Square Nav Button to Frequency Chamber - Enlarged with Play Button */}
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.7 }}
-            className="relative w-40 h-40 md:w-56 md:h-56 lg:w-64 lg:h-64 mx-auto mb-8"
+            transition={{ duration: 0.8, delay: 0.5 }}
+            className="relative w-56 h-56 md:w-72 md:h-72 lg:w-80 lg:h-80 mx-auto mb-6"
           >
             {/* Pulsing glow effect */}
             <motion.div
@@ -119,6 +104,12 @@ const HeroSection = () => {
                 alt="Enter Frequency Chamber"
                 className="w-full h-full object-cover"
               />
+              {/* Translucent Play Button Overlay */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-background/40 backdrop-blur-sm flex items-center justify-center border border-primary/30">
+                  <Play className="h-8 w-8 md:h-10 md:w-10 text-primary ml-1" fill="currentColor" fillOpacity={0.3} />
+                </div>
+              </div>
             </motion.button>
           </motion.div>
 
@@ -126,7 +117,7 @@ const HeroSection = () => {
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.9 }}
+            transition={{ duration: 0.8, delay: 0.7 }}
             className="font-display"
           >
             <span className="text-gradient-sacred text-2xl md:text-3xl lg:text-4xl">DR. POTTER, DMA</span>
