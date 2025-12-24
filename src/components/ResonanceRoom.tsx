@@ -48,7 +48,7 @@ const ResonanceRoom = () => {
             </div>
 
             {/* Features Row */}
-            <div className="grid grid-cols-3 gap-3 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
               {features.map((feature, index) => (
                 <motion.div
                   key={feature.title}
