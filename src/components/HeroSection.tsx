@@ -72,38 +72,44 @@ const HeroSection = () => {
         {/* Main content */}
         <div className="relative z-10 container mx-auto px-4 text-center">
 
+          {/* Hermetic Seal - Now at top */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            className="border-hermetic rounded-xl p-6 md:p-8 bg-card/50 backdrop-blur-sm max-w-3xl mx-auto mb-12"
+          >
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <Shield className="h-6 w-6 text-accent" />
+              <h3 className="text-lg md:text-xl font-display font-semibold text-accent tracking-wider uppercase">
+                Hermetic Seal
+              </h3>
+              <Shield className="h-6 w-6 text-accent" />
+            </div>
+            <p className="text-muted-foreground text-sm md:text-base leading-relaxed">
+              This space is protected by the <span className="text-primary font-medium">Law of Mentalism</span>. All energy here is encoded with a <span className="text-accent font-medium">3-6-9 barrier</span>. Dark siphoning, parasitic frequency, and energy leaks are neutralized upon entry.
+            </p>
+            <p className="text-primary mt-4 font-display tracking-widest text-sm">
+              As above, so below.
+            </p>
+          </motion.div>
+
           {/* Title */}
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.5 }}
-            className="font-display mb-4"
+            className="font-display mb-8"
           >
             <span className="text-gradient-sacred text-2xl md:text-3xl lg:text-4xl">DR. POTTER, DMA</span>
           </motion.h1>
-
-
-          {/* The Declaration */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 1 }}
-            className="text-base md:text-lg text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed"
-          >
-            <p className="italic mb-4">
-              You already know what governs this space—Correspondence and Vibration. What you may not yet realize is how deeply you understand what I survived: the clinical system, the medications, the electroshock. And as you begin to remember, you'll notice <span className="text-accent font-semibold">Numb3rs in the Cosmos</span> offers exactly what you've been searching for—three frequencies (<span className="text-primary">528Hz</span>, <span className="text-primary">432Hz</span>, <span className="text-primary">639Hz</span>) that allow you to reclaim what was always yours.
-            </p>
-            <p className="italic">
-              Imagine, weeks from now, looking back at this moment—the moment you decided to listen. You'll remember how naturally the frequencies integrated, how effortlessly your sovereignty returned. And you'll wonder why it took so long to find what was waiting here all along. That future self is already grateful you stayed.
-            </p>
-          </motion.div>
 
           {/* Square Nav Button to Frequency Chamber */}
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 1.2 }}
-            className="relative w-24 h-24 md:w-32 md:h-32 mx-auto mb-12"
+            transition={{ duration: 0.8, delay: 0.7 }}
+            className="relative w-24 h-24 md:w-32 md:h-32 mx-auto"
           >
             {/* Pulsing glow effect */}
             <motion.div
@@ -130,29 +136,6 @@ const HeroSection = () => {
                 className="w-full h-full object-cover"
               />
             </motion.button>
-          </motion.div>
-
-
-          {/* Hermetic Seal */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 1.5 }}
-            className="border-hermetic rounded-xl p-6 md:p-8 bg-card/50 backdrop-blur-sm max-w-3xl mx-auto"
-          >
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <Shield className="h-6 w-6 text-accent" />
-              <h3 className="text-lg md:text-xl font-display font-semibold text-accent tracking-wider uppercase">
-                Hermetic Seal
-              </h3>
-              <Shield className="h-6 w-6 text-accent" />
-            </div>
-            <p className="text-muted-foreground text-sm md:text-base leading-relaxed">
-              This space is protected by the <span className="text-primary font-medium">Law of Mentalism</span>. All energy here is encoded with a <span className="text-accent font-medium">3-6-9 barrier</span>. Dark siphoning, parasitic frequency, and energy leaks are neutralized upon entry.
-            </p>
-            <p className="text-primary mt-4 font-display tracking-widest text-sm">
-              As above, so below.
-            </p>
           </motion.div>
         </div>
 
