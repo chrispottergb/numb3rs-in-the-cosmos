@@ -160,7 +160,7 @@ const HeroSection = () => {
           </div>
 
           {/* 3 Hero Images Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-2xl mx-auto mb-8">
             {tracks.map((track, index) => (
               <motion.div
                 key={track.id}
