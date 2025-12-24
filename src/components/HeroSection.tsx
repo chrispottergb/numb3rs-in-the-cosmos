@@ -51,15 +51,6 @@ const HeroSection = () => {
           <span className="text-gradient-sacred text-2xl md:text-3xl lg:text-4xl">DR. POTTER, DMA</span>
         </motion.h1>
 
-        {/* Subtitle */}
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.7 }}
-          className="text-xl md:text-2xl text-primary mb-8 max-w-2xl mx-auto tracking-widest"
-        >
-          Frequency Medicine for the 4th Dimension
-        </motion.p>
 
         {/* The Declaration */}
         <motion.div
