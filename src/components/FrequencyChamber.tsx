@@ -98,19 +98,6 @@ const FrequencyChamber = () => {
                   {/* Glow effect */}
                   <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent pointer-events-none" />
                 </div>
-
-                {/* Track info */}
-                <div className="mt-4 text-center">
-                  <h3 className="text-xl font-display text-foreground mb-1">
-                    {track.title}
-                  </h3>
-                  <p className="text-primary text-glow-cyan">
-                    {track.frequency}
-                  </p>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {track.description}
-                  </p>
-                </div>
               </motion.div>
             ))}
           </motion.div>
