@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Play, Pause, SkipBack, SkipForward, Volume2, Maximize2, Minimize2, Upload, Music, Edit2 } from 'lucide-react';
+import { X, Play, Pause, SkipBack, SkipForward, Volume2, Maximize2, Minimize2, Upload, Music, Edit2, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 import { Slider } from '@/components/ui/slider';
 import SacredGeometryVisualizer from './SacredGeometryVisualizer';
 import TrackSlotUploader from './TrackSlotUploader';
@@ -144,6 +145,31 @@ const FullscreenVisualizer = ({ isOpen, onClose }: FullscreenVisualizerProps) =>
     return playableIdx;
   };
 
+  const deleteTrack = async (track: Track) => {
+    try {
+      // Delete from database
+      const { error: dbError } = await supabase
+        .from('audio_tracks')
+        .delete()
+        .eq('id', track.id);
+
+      if (dbError) throw dbError;
+
+      // Try to delete from storage (extract filename from URL)
+      const urlParts = track.file_url.split('/');
+      const fileName = urlParts[urlParts.length - 1];
+      if (fileName) {
+        await supabase.storage.from('audio-tracks').remove([fileName]);
+      }
+
+      toast.success('Track deleted successfully');
+      fetchTracks();
+    } catch (error) {
+      console.error('Delete error:', error);
+      toast.error('Failed to delete track');
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -226,15 +252,27 @@ const FullscreenVisualizer = ({ isOpen, onClose }: FullscreenVisualizerProps) =>
                   </p>
                 </div>
                 
-                {/* Upload/Edit button */}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-6 text-xs"
-                  onClick={() => setUploadingSlot(index)}
-                >
-                  {hasAudio ? 'Replace' : 'Upload'}
-                </Button>
+                {/* Upload/Delete buttons */}
+                <div className="flex gap-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 text-xs"
+                    onClick={() => setUploadingSlot(index)}
+                  >
+                    {hasAudio ? 'Replace' : 'Upload'}
+                  </Button>
+                  {hasAudio && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 text-xs text-destructive hover:text-destructive"
+                      onClick={() => deleteTrack(slotTrack)}
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  )}
+                </div>
               </motion.div>
             );
           })}
