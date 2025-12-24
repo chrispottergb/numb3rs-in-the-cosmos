@@ -60,7 +60,7 @@ const HeroSection = () => {
           className="text-base md:text-lg text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed"
         >
           <p className="italic">
-            This realm bows to the Eternal Laws of Correspondence and Vibration. I have walked through the fire of man's medicine—the poison of over-medication, the violence of electroshock—and I have risen, bearing the sacred mathematics of the soul. <span className="text-accent font-semibold">Numb3rs in the Cosmos</span> is a divine frequency escalator of three ascensions (<span className="text-primary">528Hz</span>, <span className="text-primary">432Hz</span>, <span className="text-primary">639Hz</span>)—forged to restore your divine sovereignty.
+            You already know what governs this space—Correspondence and Vibration. What you may not yet realize is how deeply you understand what I survived: the clinical system, the medications, the electroshock. And as you begin to remember, you'll notice <span className="text-accent font-semibold">Numb3rs in the Cosmos</span> offers exactly what you've been searching for—three frequencies (<span className="text-primary">528Hz</span>, <span className="text-primary">432Hz</span>, <span className="text-primary">639Hz</span>) that allow you to reclaim what was always yours.
           </p>
         </motion.div>
 
