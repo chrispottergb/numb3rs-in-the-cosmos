@@ -313,45 +313,6 @@ const FullscreenVisualizer = ({ isOpen, onClose }: FullscreenVisualizerProps) =>
               </p>
             )}
 
-            {/* Track list with edit buttons */}
-            {hasPlayableTracks && (
-              <div className="mt-8 border-t border-border/30 pt-6">
-                <h4 className="text-sm font-medium text-muted-foreground mb-3">Uploaded Tracks</h4>
-                <div className="flex gap-2 overflow-x-auto pb-2">
-                  {playableTracks.map((track, index) => (
-                    <div
-                      key={track.id}
-                      className={`flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
-                        currentTrackIndex === index
-                          ? 'bg-primary/20 border-hermetic text-primary'
-                          : 'bg-muted/30 hover:bg-muted/50 text-muted-foreground'
-                      }`}
-                    >
-                      <button
-                        onClick={() => skipTo(index)}
-                        className="flex items-center gap-2"
-                      >
-                        <span className="font-medium text-sm">{track.title}</span>
-                        {track.frequency && (
-                          <span className="text-xs opacity-70">{track.frequency}</span>
-                        )}
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setEditingTrack(track);
-                          setShowEditor(true);
-                        }}
-                        className="p-1 hover:bg-primary/20 rounded transition-colors"
-                        title="Edit track"
-                      >
-                        <Edit2 className="h-3 w-3" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         </motion.div>
 
