@@ -87,6 +87,16 @@ const HeroSection = () => {
             />
           </motion.div>
 
+          {/* Album Title */}
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+            className="text-2xl md:text-3xl lg:text-4xl font-display text-gradient-sacred mb-4 tracking-wider"
+          >
+            NUMB3RS IN THE COSMOS
+          </motion.h2>
+
           {/* Square Nav Button to Frequency Chamber */}
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
