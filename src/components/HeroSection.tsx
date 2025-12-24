@@ -74,21 +74,38 @@ const HeroSection = () => {
         </motion.div>
 
         {/* Square Nav Button to Audio Tracks */}
-        <motion.button
-          onClick={scrollToFrequencyChamber}
+        <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, delay: 1.2 }}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="w-24 h-24 md:w-32 md:h-32 mx-auto mb-12 rounded-xl border-hermetic bg-card/50 backdrop-blur-sm hover:bg-card/80 transition-all duration-300 overflow-hidden shadow-sacred cursor-pointer"
+          className="relative w-24 h-24 md:w-32 md:h-32 mx-auto mb-12"
         >
-          <img
-            src={cosmicSeal}
-            alt="Enter Frequency Chamber"
-            className="w-full h-full object-cover"
+          {/* Pulsing glow effect */}
+          <motion.div
+            className="absolute inset-0 rounded-xl bg-primary/30 blur-xl"
+            animate={{
+              opacity: [0.3, 0.7, 0.3],
+              scale: [1, 1.15, 1],
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
           />
-        </motion.button>
+          <motion.button
+            onClick={scrollToFrequencyChamber}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="relative w-full h-full rounded-xl border-hermetic bg-card/50 backdrop-blur-sm hover:bg-card/80 transition-all duration-300 overflow-hidden shadow-sacred cursor-pointer z-10"
+          >
+            <img
+              src={cosmicSeal}
+              alt="Enter Frequency Chamber"
+              className="w-full h-full object-cover"
+            />
+          </motion.button>
+        </motion.div>
 
 
         {/* Hermetic Seal */}
