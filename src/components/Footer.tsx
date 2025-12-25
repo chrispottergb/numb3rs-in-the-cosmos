@@ -7,21 +7,6 @@ const Footer = () => {
       
       <div className="relative z-10 container mx-auto px-4">
         <div className="text-center">
-          {/* Logo */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="mb-8"
-          >
-            <h3 className="text-3xl font-display text-gradient-sacred mb-2">
-              Numb3rs in the Cosmos
-            </h3>
-            <p className="text-muted-foreground text-sm">
-              Frequency Medicine · Sacred Geometry · Divine Mathematics
-            </p>
-          </motion.div>
 
           {/* Sacred geometry divider */}
           <div className="flex items-center justify-center gap-4 mb-8">

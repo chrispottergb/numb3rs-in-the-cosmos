@@ -22,7 +22,7 @@ const features = [
 
 const ResonanceRoom = () => {
   return (
-    <section className="relative py-12 overflow-hidden" id="resonance-room">
+    <section className="relative py-6 overflow-hidden" id="resonance-room">
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-background via-muted/10 to-background" />
 
@@ -36,19 +36,19 @@ const ResonanceRoom = () => {
           viewport={{ once: true }}
           className="max-w-3xl mx-auto"
         >
-          <div className="relative border-hermetic rounded-xl bg-card/50 backdrop-blur-sm p-6 md:p-8 shadow-sacred">
+          <div className="relative border-hermetic rounded-xl bg-card/50 backdrop-blur-sm p-4 md:p-6 shadow-sacred">
             {/* Title */}
-            <div className="text-center mb-6">
-              <h3 className="text-xl md:text-2xl font-display text-accent mb-2 tracking-wider">
+            <div className="text-center mb-4">
+              <h3 className="text-lg md:text-xl font-display text-accent mb-1 tracking-wider">
                 Join the 3-6-9 Circle
               </h3>
-              <p className="text-muted-foreground text-sm max-w-xl mx-auto">
+              <p className="text-muted-foreground text-xs max-w-xl mx-auto">
                 A gated Discord community for those ready to leave the 3D system behind.
               </p>
             </div>
 
             {/* Features Row */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-4">
               {features.map((feature, index) => (
                 <motion.div
                   key={feature.title}
