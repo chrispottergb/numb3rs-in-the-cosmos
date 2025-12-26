@@ -1,11 +1,21 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Sparkles, Swords, Heart, Zap } from "lucide-react";
 import { toast } from "sonner";
 
+interface GameSounds {
+  playClick: () => void;
+  playHit: () => void;
+  playPowerup: () => void;
+  playLevelUp: () => void;
+  playFail: () => void;
+}
+
 interface GameProps {
   onEarnBadge: (badge: string) => void;
   badges: string[];
+  soundEnabled?: boolean;
+  gameSounds?: GameSounds;
 }
 
 const HEROES = [
@@ -20,7 +30,7 @@ const ENEMIES = [
   { name: "Chaos Sphere", emoji: "🔮", hp: 120, attack: 15 },
 ];
 
-const FractalBrawler = ({ onEarnBadge, badges }: GameProps) => {
+const FractalBrawler = ({ onEarnBadge, badges, soundEnabled = true, gameSounds }: GameProps) => {
   const [selectedHero, setSelectedHero] = useState<string | null>(null);
   const [heroHp, setHeroHp] = useState(100);
   const [enemyIndex, setEnemyIndex] = useState(0);
@@ -39,6 +49,12 @@ const FractalBrawler = ({ onEarnBadge, badges }: GameProps) => {
   const hero = HEROES.find(h => h.id === selectedHero);
   const enemy = ENEMIES[enemyIndex];
 
+  const playSound = useCallback((sound: keyof GameSounds) => {
+    if (soundEnabled && gameSounds && gameSounds[sound]) {
+      gameSounds[sound]();
+    }
+  }, [soundEnabled, gameSounds]);
+
   useEffect(() => {
     localStorage.setItem("brawler-streak", winStreak.toString());
     localStorage.setItem("brawler-wins", totalWins.toString());
@@ -54,6 +70,7 @@ const FractalBrawler = ({ onEarnBadge, badges }: GameProps) => {
   const attack = () => {
     if (!hero || isAttacking) return;
     setIsAttacking(true);
+    playSound('playHit');
 
     const damage = Math.floor(hero.attack * (0.8 + Math.random() * 0.4));
     const newEnemyHp = Math.max(0, enemyHp - damage);
@@ -73,6 +90,7 @@ const FractalBrawler = ({ onEarnBadge, badges }: GameProps) => {
 
   const enemyAttack = () => {
     if (!hero) return;
+    playSound('playHit');
     const damage = Math.max(1, Math.floor(enemy.attack * (0.8 + Math.random() * 0.4) - hero.defense / 2));
     const newHeroHp = Math.max(0, heroHp - damage);
     
@@ -85,6 +103,7 @@ const FractalBrawler = ({ onEarnBadge, badges }: GameProps) => {
   };
 
   const handleVictory = () => {
+    playSound('playLevelUp');
     setWinStreak(s => s + 1);
     setTotalWins(t => t + 1);
     setBattleLog(prev => [...prev.slice(-4), `✨ Victory! ${enemy.name} defeated!`]);
@@ -100,6 +119,7 @@ const FractalBrawler = ({ onEarnBadge, badges }: GameProps) => {
   };
 
   const handleDefeat = () => {
+    playSound('playFail');
     setWinStreak(0);
     setBattleLog(prev => [...prev.slice(-4), `💀 Defeat... Your hero has fallen.`]);
     toast.error("Defeat!", { description: "Your consciousness must reawaken..." });
@@ -114,6 +134,7 @@ const FractalBrawler = ({ onEarnBadge, badges }: GameProps) => {
 
   const healAbility = () => {
     if (!hero) return;
+    playSound('playPowerup');
     const heal = Math.floor(20 + Math.random() * 10);
     setHeroHp(hp => Math.min(100, hp + heal));
     setBattleLog(prev => [...prev.slice(-4), `💚 Healed for ${heal} HP!`]);
@@ -134,6 +155,7 @@ const FractalBrawler = ({ onEarnBadge, badges }: GameProps) => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => {
+                playSound('playClick');
                 setSelectedHero(h.id);
                 setHeroHp(100);
               }}
@@ -229,7 +251,10 @@ const FractalBrawler = ({ onEarnBadge, badges }: GameProps) => {
       </div>
 
       <button
-        onClick={() => setSelectedHero(null)}
+        onClick={() => {
+          playSound('playClick');
+          setSelectedHero(null);
+        }}
         className="w-full mt-4 p-2 text-sm text-muted-foreground hover:text-primary"
       >
         ← Choose different hero

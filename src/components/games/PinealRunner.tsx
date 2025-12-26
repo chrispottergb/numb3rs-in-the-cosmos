@@ -3,9 +3,20 @@ import { motion } from "framer-motion";
 import { Sparkles, RotateCcw, Play, Pause } from "lucide-react";
 import { toast } from "sonner";
 
+interface GameSounds {
+  playClick: () => void;
+  playCoin: () => void;
+  playJump: () => void;
+  playHit: () => void;
+  playFail: () => void;
+  playLevelUp: () => void;
+}
+
 interface GameProps {
   onEarnBadge: (badge: string) => void;
   badges: string[];
+  soundEnabled?: boolean;
+  gameSounds?: GameSounds;
 }
 
 const LANE_COUNT = 3;
@@ -18,7 +29,7 @@ type Obstacle = {
   type: "guardian" | "coin";
 };
 
-const PinealRunner = ({ onEarnBadge, badges }: GameProps) => {
+const PinealRunner = ({ onEarnBadge, badges, soundEnabled = true, gameSounds }: GameProps) => {
   const [playerLane, setPlayerLane] = useState(1);
   const [isPlaying, setIsPlaying] = useState(false);
   const [distance, setDistance] = useState(0);
@@ -30,6 +41,12 @@ const PinealRunner = ({ onEarnBadge, badges }: GameProps) => {
   });
   const gameLoop = useRef<NodeJS.Timeout | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const playSound = useCallback((sound: keyof GameSounds) => {
+    if (soundEnabled && gameSounds && gameSounds[sound]) {
+      gameSounds[sound]();
+    }
+  }, [soundEnabled, gameSounds]);
 
   const resetGame = useCallback(() => {
     setPlayerLane(1);
@@ -89,9 +106,11 @@ const PinealRunner = ({ onEarnBadge, badges }: GameProps) => {
 
         if (collision) {
           if (collision.type === "coin") {
+            playSound('playCoin');
             setCoins(c => c + 1);
             return prev.filter(o => o.id !== collision.id);
           } else {
+            playSound('playHit');
             setIsPlaying(false);
             return prev;
           }
@@ -103,10 +122,11 @@ const PinealRunner = ({ onEarnBadge, badges }: GameProps) => {
     return () => {
       if (gameLoop.current) clearInterval(gameLoop.current);
     };
-  }, [isPlaying, playerLane]);
+  }, [isPlaying, playerLane, playSound]);
 
   const handleSwipe = (direction: "left" | "right") => {
     if (!isPlaying) return;
+    playSound('playJump');
     setPlayerLane(prev => {
       if (direction === "left" && prev > 0) return prev - 1;
       if (direction === "right" && prev < 2) return prev + 1;
@@ -137,7 +157,10 @@ const PinealRunner = ({ onEarnBadge, badges }: GameProps) => {
             <p className="text-xs text-muted-foreground">Best: {highScore}m</p>
           </div>
           <button
-            onClick={resetGame}
+            onClick={() => {
+              playSound('playClick');
+              resetGame();
+            }}
             className="p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
           >
             <RotateCcw className="w-5 h-5" />
@@ -207,6 +230,7 @@ const PinealRunner = ({ onEarnBadge, badges }: GameProps) => {
           <div className="absolute inset-0 bg-background/80 flex flex-col items-center justify-center">
             <button
               onClick={() => {
+                playSound('playClick');
                 resetGame();
                 setTimeout(() => setIsPlaying(true), 100);
               }}

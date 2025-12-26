@@ -3,9 +3,18 @@ import { motion } from "framer-motion";
 import { Sparkles, Play, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 
+interface GameSounds {
+  playClick: () => void;
+  playCoin: () => void;
+  playFail: () => void;
+  playLevelUp: () => void;
+}
+
 interface GameProps {
   onEarnBadge: (badge: string) => void;
   badges: string[];
+  soundEnabled?: boolean;
+  gameSounds?: GameSounds;
 }
 
 const GRID_SIZE = 15;
@@ -14,7 +23,7 @@ const INITIAL_SPEED = 150;
 
 type Position = { x: number; y: number };
 
-const SpiralSnake = ({ onEarnBadge, badges }: GameProps) => {
+const SpiralSnake = ({ onEarnBadge, badges, soundEnabled = true, gameSounds }: GameProps) => {
   const [snake, setSnake] = useState<Position[]>([{ x: 7, y: 7 }]);
   const [food, setFood] = useState<Position>({ x: 5, y: 5 });
   const [direction, setDirection] = useState<Position>({ x: 1, y: 0 });
@@ -26,6 +35,12 @@ const SpiralSnake = ({ onEarnBadge, badges }: GameProps) => {
   });
   const gameLoop = useRef<NodeJS.Timeout | null>(null);
   const directionRef = useRef(direction);
+
+  const playSound = useCallback((sound: keyof GameSounds) => {
+    if (soundEnabled && gameSounds && gameSounds[sound]) {
+      gameSounds[sound]();
+    }
+  }, [soundEnabled, gameSounds]);
 
   useEffect(() => {
     directionRef.current = direction;
@@ -80,6 +95,7 @@ const SpiralSnake = ({ onEarnBadge, badges }: GameProps) => {
 
         // Check self collision
         if (prev.some(s => s.x === newHead.x && s.y === newHead.y)) {
+          playSound('playFail');
           setIsPlaying(false);
           toast.error("Game Over!", { description: `Final Score: ${score}` });
           return prev;
@@ -89,6 +105,7 @@ const SpiralSnake = ({ onEarnBadge, badges }: GameProps) => {
 
         // Check food collision
         if (newHead.x === food.x && newHead.y === food.y) {
+          playSound('playCoin');
           setScore(s => s + 1);
           setFood(spawnFood(newSnake));
           return newSnake; // Don't remove tail = grow
@@ -101,7 +118,7 @@ const SpiralSnake = ({ onEarnBadge, badges }: GameProps) => {
     return () => {
       if (gameLoop.current) clearInterval(gameLoop.current);
     };
-  }, [isPlaying, food, spawnFood, score]);
+  }, [isPlaying, food, spawnFood, score, playSound]);
 
   const handleDirection = useCallback((newDir: Position) => {
     // Prevent 180 degree turns
@@ -135,7 +152,10 @@ const SpiralSnake = ({ onEarnBadge, badges }: GameProps) => {
             <p className="text-xs text-muted-foreground">Best: {highScore}</p>
           </div>
           <button
-            onClick={resetGame}
+            onClick={() => {
+              playSound('playClick');
+              resetGame();
+            }}
             className="p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
           >
             <RotateCcw className="w-5 h-5" />
@@ -194,6 +214,7 @@ const SpiralSnake = ({ onEarnBadge, badges }: GameProps) => {
           <div className="absolute inset-0 bg-background/80 flex flex-col items-center justify-center rounded-lg">
             <button
               onClick={() => {
+                playSound('playClick');
                 if (snake.length === 1 && score === 0) {
                   setIsPlaying(true);
                 } else {

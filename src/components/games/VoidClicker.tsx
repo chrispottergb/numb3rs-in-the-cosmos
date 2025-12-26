@@ -1,11 +1,22 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Sparkles, RotateCcw, Zap } from "lucide-react";
 import { toast } from "sonner";
 
+interface GameSounds {
+  playClick: () => void;
+  playMatch: () => void;
+  playLevelUp: () => void;
+  playBadge: () => void;
+  playPowerup: () => void;
+  playCoin: () => void;
+}
+
 interface GameProps {
   onEarnBadge: (badge: string) => void;
   badges: string[];
+  soundEnabled?: boolean;
+  gameSounds?: GameSounds;
 }
 
 const UPGRADES = [
@@ -15,7 +26,7 @@ const UPGRADES = [
   { id: "dominion", name: "Dominion Matrix", cost: 5000, cps: 100 },
 ];
 
-const VoidClicker = ({ onEarnBadge, badges }: GameProps) => {
+const VoidClicker = ({ onEarnBadge, badges, soundEnabled = true, gameSounds }: GameProps) => {
   const [quanta, setQuanta] = useState(() => {
     const saved = localStorage.getItem("void-quanta");
     return saved ? parseFloat(saved) : 0;
@@ -36,6 +47,12 @@ const VoidClicker = ({ onEarnBadge, badges }: GameProps) => {
   const [pulseScale, setPulseScale] = useState(1);
 
   const cps = UPGRADES.reduce((sum, u) => sum + (upgrades[u.id] || 0) * u.cps, 0) * (1 + ascensions * 0.5);
+
+  const playSound = useCallback((sound: keyof GameSounds) => {
+    if (soundEnabled && gameSounds && gameSounds[sound]) {
+      gameSounds[sound]();
+    }
+  }, [soundEnabled, gameSounds]);
 
   useEffect(() => {
     localStorage.setItem("void-quanta", quanta.toString());
@@ -64,6 +81,7 @@ const VoidClicker = ({ onEarnBadge, badges }: GameProps) => {
   }, [cps]);
 
   const handleClick = () => {
+    playSound('playClick');
     const gain = clickPower * (1 + ascensions * 0.5);
     setQuanta(q => q + gain);
     setTotalQuanta(t => t + gain);
@@ -73,6 +91,7 @@ const VoidClicker = ({ onEarnBadge, badges }: GameProps) => {
 
   const buyUpgrade = (upgradeId: string, cost: number) => {
     if (quanta >= cost) {
+      playSound('playPowerup');
       setQuanta(q => q - cost);
       setUpgrades(u => ({ ...u, [upgradeId]: (u[upgradeId] || 0) + 1 }));
     }
@@ -86,6 +105,7 @@ const VoidClicker = ({ onEarnBadge, badges }: GameProps) => {
 
   const handleAscension = () => {
     if (canAscend) {
+      playSound('playLevelUp');
       setAscensions(a => a + 1);
       setQuanta(0);
       setTotalQuanta(0);

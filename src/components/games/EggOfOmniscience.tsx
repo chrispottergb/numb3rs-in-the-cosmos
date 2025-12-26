@@ -1,11 +1,20 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Sparkles, Egg, Zap, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 
+interface GameSounds {
+  playClick: () => void;
+  playPowerup: () => void;
+  playLevelUp: () => void;
+  playCoin: () => void;
+}
+
 interface GameProps {
   onEarnBadge: (badge: string) => void;
   badges: string[];
+  soundEnabled?: boolean;
+  gameSounds?: GameSounds;
 }
 
 const EGGS = [
@@ -22,7 +31,7 @@ const DRONES = [
   { id: "quantum", name: "Quantum Drone", multiplier: 20, cost: 50000 },
 ];
 
-const EggOfOmniscience = ({ onEarnBadge, badges }: GameProps) => {
+const EggOfOmniscience = ({ onEarnBadge, badges, soundEnabled = true, gameSounds }: GameProps) => {
   const [eggs, setEggs] = useState(() => {
     const saved = localStorage.getItem("egg-eggs");
     return saved ? parseFloat(saved) : 0;
@@ -46,6 +55,12 @@ const EggOfOmniscience = ({ onEarnBadge, badges }: GameProps) => {
 
   const droneMultiplier = DRONES.reduce((mult, d) => mult + (drones[d.id] || 0) * (d.multiplier - 1), 1);
   const eps = EGGS.reduce((sum, e) => sum + (farms[e.id] || 0) * e.value, 0) * dimension * droneMultiplier;
+
+  const playSound = useCallback((sound: keyof GameSounds) => {
+    if (soundEnabled && gameSounds && gameSounds[sound]) {
+      gameSounds[sound]();
+    }
+  }, [soundEnabled, gameSounds]);
 
   useEffect(() => {
     localStorage.setItem("egg-eggs", eggs.toString());
@@ -76,12 +91,14 @@ const EggOfOmniscience = ({ onEarnBadge, badges }: GameProps) => {
   }, [eps]);
 
   const hatchEgg = () => {
+    playSound('playClick');
     setEggs(e => e + dimension * droneMultiplier);
     setTotalEggs(t => t + dimension * droneMultiplier);
   };
 
   const buyFarm = (eggId: string, cost: number) => {
     if (eggs >= cost) {
+      playSound('playPowerup');
       setEggs(e => e - cost);
       setFarms(f => ({ ...f, [eggId]: (f[eggId] || 0) + 1 }));
     }
@@ -89,6 +106,7 @@ const EggOfOmniscience = ({ onEarnBadge, badges }: GameProps) => {
 
   const buyDrone = (droneId: string, cost: number) => {
     if (eggs >= cost) {
+      playSound('playPowerup');
       setEggs(e => e - cost);
       setDrones(d => ({ ...d, [droneId]: (d[droneId] || 0) + 1 }));
     }
@@ -102,6 +120,7 @@ const EggOfOmniscience = ({ onEarnBadge, badges }: GameProps) => {
 
   const handlePrestige = () => {
     if (canPrestige) {
+      playSound('playLevelUp');
       setDimension(d => d + 1);
       setEggs(0);
       setTotalEggs(0);

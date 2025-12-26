@@ -1,11 +1,20 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Sparkles, Play, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 
+interface GameSounds {
+  playClick: () => void;
+  playHit: () => void;
+  playLevelUp: () => void;
+  playFail: () => void;
+}
+
 interface GameProps {
   onEarnBadge: (badge: string) => void;
   badges: string[];
+  soundEnabled?: boolean;
+  gameSounds?: GameSounds;
 }
 
 type Ball = {
@@ -31,7 +40,7 @@ const BRICK_WIDTH = 40;
 const BRICK_HEIGHT = 20;
 const PADDLE_WIDTH = 60;
 
-const BallzOfBeing = ({ onEarnBadge, badges }: GameProps) => {
+const BallzOfBeing = ({ onEarnBadge, badges, soundEnabled = true, gameSounds }: GameProps) => {
   const [balls, setBalls] = useState<Ball[]>([]);
   const [bricks, setBricks] = useState<Brick[]>([]);
   const [paddleX, setPaddleX] = useState(CANVAS_WIDTH / 2 - PADDLE_WIDTH / 2);
@@ -44,6 +53,12 @@ const BallzOfBeing = ({ onEarnBadge, badges }: GameProps) => {
   });
   const gameLoop = useRef<NodeJS.Timeout | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const playSound = useCallback((sound: keyof GameSounds) => {
+    if (soundEnabled && gameSounds && gameSounds[sound]) {
+      gameSounds[sound]();
+    }
+  }, [soundEnabled, gameSounds]);
 
   const initLevel = () => {
     const newBricks: Brick[] = [];
@@ -90,11 +105,12 @@ const BallzOfBeing = ({ onEarnBadge, badges }: GameProps) => {
 
   useEffect(() => {
     if (bricks.length === 0 && isPlaying) {
+      playSound('playLevelUp');
       setTotalClears(c => c + 1);
       toast.success(`Level ${level} Complete!`);
       setTimeout(() => setLevel(l => l + 1), 1000);
     }
-  }, [bricks, isPlaying, level]);
+  }, [bricks, isPlaying, level, playSound]);
 
   useEffect(() => {
     if (!isPlaying) {
@@ -133,6 +149,7 @@ const BallzOfBeing = ({ onEarnBadge, badges }: GameProps) => {
 
           // Ball lost
           if (newY >= CANVAS_HEIGHT) {
+            playSound('playFail');
             setIsPlaying(false);
             toast.error("Ball lost!", { description: "Try again!" });
             return { ...ball, active: false };
@@ -153,6 +170,7 @@ const BallzOfBeing = ({ onEarnBadge, badges }: GameProps) => {
           });
           
           if (ballHit) {
+            playSound('playHit');
             setScore(s => s + 10);
             if (brick.hp <= 1) {
               return false;
@@ -167,10 +185,11 @@ const BallzOfBeing = ({ onEarnBadge, badges }: GameProps) => {
     return () => {
       if (gameLoop.current) clearInterval(gameLoop.current);
     };
-  }, [isPlaying, paddleX, balls]);
+  }, [isPlaying, paddleX, balls, playSound]);
 
   const launchBall = () => {
     if (balls.some(b => b.active)) return;
+    playSound('playClick');
     setBalls(prev => prev.map(b => ({ ...b, active: true })));
     setIsPlaying(true);
   };
@@ -195,7 +214,10 @@ const BallzOfBeing = ({ onEarnBadge, badges }: GameProps) => {
             <p className="text-xs text-muted-foreground">Clears: {totalClears}</p>
           </div>
           <button
-            onClick={initLevel}
+            onClick={() => {
+              playSound('playClick');
+              initLevel();
+            }}
             className="p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
           >
             <RotateCcw className="w-5 h-5" />
