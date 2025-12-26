@@ -30,7 +30,7 @@ const games = [
 
 const Games = () => {
   const [activeGame, setActiveGame] = useState<string | null>(null);
-  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [soundEnabled, setSoundEnabled] = useState(false); // Disabled by default to avoid unexpected beeps
   const [badges, setBadges] = useState<string[]>(() => {
     const saved = localStorage.getItem("sacred-badges");
     return saved ? JSON.parse(saved) : [];
