@@ -140,11 +140,11 @@ const HeroSection = () => {
 
       {/* Frequency Chamber Dialog */}
       <Dialog open={showChamber} onOpenChange={setShowChamber}>
-        <DialogContent className="max-w-sm w-[85vw] h-auto bg-background/95 backdrop-blur-xl border-hermetic p-4 overflow-hidden">
+        <DialogContent className="max-w-xs w-[75vw] bg-background/95 backdrop-blur-xl border-hermetic p-3 overflow-hidden">
 
-          {/* 3 Hero Images Grid */}
-          <div className="flex justify-center mb-4">
-            <div className="grid grid-cols-3 gap-2 w-full">
+          {/* 3 Hero Images Grid - Compact */}
+          <div className="flex justify-center mb-2">
+            <div className="grid grid-cols-3 gap-1.5 w-full">
               {tracks.map((track, index) => (
                 <motion.div
                   key={track.id}
@@ -172,12 +172,9 @@ const HeroSection = () => {
                     </div>
                   </div>
 
-                  {/* Track info */}
-                  <div className="mt-1 text-center">
-                    <h3 className="text-xs font-display text-foreground">
-                      {track.title}
-                    </h3>
-                    <p className="text-primary text-glow-cyan text-[10px]">
+                  {/* Track info - minimal */}
+                  <div className="mt-0.5 text-center">
+                    <p className="text-primary text-glow-cyan text-[9px]">
                       {track.frequency}
                     </p>
                   </div>
@@ -186,15 +183,16 @@ const HeroSection = () => {
             </div>
           </div>
 
-          {/* CTA Button */}
+          {/* CTA Button - Compact */}
           <div className="flex justify-center">
             <Button
               variant="sacred"
-              size="default"
+              size="sm"
               onClick={() => { setShowVisualizer(true); setShowChamber(false); }}
+              className="text-xs"
             >
-              <Maximize2 className="h-4 w-4 mr-2" />
-              Fullscreen Visualizer
+              <Maximize2 className="h-3 w-3 mr-1" />
+              Visualizer
             </Button>
           </div>
         </DialogContent>

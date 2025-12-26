@@ -32,9 +32,10 @@ const Navigation = () => {
           </Link>
           <Link
             to="/merch"
-            className="text-sm text-muted-foreground hover:text-primary transition-colors font-medium tracking-wide"
+            className="relative text-sm font-medium tracking-wide px-4 py-2 rounded-full bg-primary/20 text-primary border border-primary/50 hover:bg-primary/30 hover:border-primary transition-all duration-300 animate-pulse"
           >
-            Merch
+            <span className="absolute inset-0 rounded-full bg-primary/20 blur-md animate-pulse" />
+            <span className="relative">🛒 Merch</span>
           </Link>
           {navLinks.map((link) => (
             <a
