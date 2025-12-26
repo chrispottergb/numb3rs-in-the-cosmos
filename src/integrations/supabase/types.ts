@@ -50,6 +50,30 @@ export type Database = {
         }
         Relationships: []
       }
+      game_leaderboard: {
+        Row: {
+          created_at: string
+          game_id: string
+          id: string
+          player_name: string
+          score: number
+        }
+        Insert: {
+          created_at?: string
+          game_id: string
+          id?: string
+          player_name: string
+          score?: number
+        }
+        Update: {
+          created_at?: string
+          game_id?: string
+          id?: string
+          player_name?: string
+          score?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
