@@ -4,12 +4,12 @@ import { Play, Maximize2 } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import FullscreenVisualizer from "./FullscreenVisualizer";
+import { useAudioPlayerContext } from "@/contexts/AudioPlayerContext";
 
 import cosmicSeal from "@/assets/cosmic-seal-hero.png";
 import flowerOfLife from "@/assets/flower-of-life.png";
 import metatronsCube from "@/assets/metatrons-cube.png";
 import torusField from "@/assets/torus-field.png";
-
 
 const tracks = [
   { 
@@ -37,9 +37,14 @@ const tracks = [
 
 const HeroSection = () => {
   const [showChamber, setShowChamber] = useState(false);
-  const [showVisualizer, setShowVisualizer] = useState(false);
+  const { openVisualizer, isVisualizerOpen } = useAudioPlayerContext();
   
   const [hoveredTrack, setHoveredTrack] = useState<number | null>(null);
+
+  const handleOpenVisualizer = () => {
+    setShowChamber(false);
+    openVisualizer();
+  };
 
   return (
     <>
@@ -151,7 +156,7 @@ const HeroSection = () => {
                   className="relative group cursor-pointer"
                   onMouseEnter={() => setHoveredTrack(index)}
                   onMouseLeave={() => setHoveredTrack(null)}
-                  onClick={() => { setShowVisualizer(true); setShowChamber(false); }}
+                  onClick={handleOpenVisualizer}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
@@ -188,7 +193,7 @@ const HeroSection = () => {
             <Button
               variant="sacred"
               size="sm"
-              onClick={() => { setShowVisualizer(true); setShowChamber(false); }}
+              onClick={handleOpenVisualizer}
               className="text-xs"
             >
               <Maximize2 className="h-3 w-3 mr-1" />
@@ -198,11 +203,7 @@ const HeroSection = () => {
         </DialogContent>
       </Dialog>
 
-      <FullscreenVisualizer
-        isOpen={showVisualizer}
-        onClose={() => setShowVisualizer(false)}
-      />
-
+      <FullscreenVisualizer />
     </>
   );
 };

@@ -1,66 +1,26 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Play, Pause, SkipBack, SkipForward, Volume2, Maximize2, Minimize2, Upload, Music, Edit2, Trash2 } from 'lucide-react';
+import { X, Play, Pause, SkipBack, SkipForward, Volume2, Maximize2, Minimize2, Music } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
 import { Slider } from '@/components/ui/slider';
 import SacredGeometryVisualizer from './SacredGeometryVisualizer';
-import TrackSlotUploader from './TrackSlotUploader';
-import TrackEditor from './TrackEditor';
 import WaveformProgress from './WaveformProgress';
-import { useAudioPlayer } from '@/hooks/useAudioPlayer';
-import { supabase } from '@/integrations/supabase/client';
+import { useAudioPlayerContext } from '@/contexts/AudioPlayerContext';
 import flowerOfLife from '@/assets/flower-of-life.png';
 import metatronsCube from '@/assets/metatrons-cube.png';
 import torusField from '@/assets/torus-field.png';
 
-interface Track {
-  id: string;
-  title: string;
-  frequency: string;
-  duration: string;
-  file_url: string;
-  description?: string;
-}
-
-// Default track slot definitions
 const defaultSlots = [
-  { 
-    title: "The Spell Breaker", 
-    frequency: "528Hz", 
-    description: "Track slot 0",
-  },
-  { 
-    title: "Numb3rs in the Cosmos", 
-    frequency: "432Hz", 
-    description: "Track slot 1",
-  },
-  { 
-    title: "Infinity Sign", 
-    frequency: "639Hz", 
-    description: "Track slot 2",
-  },
+  { title: "The Spell Breaker", frequency: "528Hz" },
+  { title: "Numb3rs in the Cosmos", frequency: "432Hz" },
+  { title: "Infinity Sign", frequency: "639Hz" },
 ];
 
 const trackImages = [flowerOfLife, metatronsCube, torusField];
 
-interface FullscreenVisualizerProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
-
-const FullscreenVisualizer = ({ isOpen, onClose }: FullscreenVisualizerProps) => {
-  // Track slots: array of 3, each can be null or a Track
-  const [trackSlots, setTrackSlots] = useState<(Track | null)[]>([null, null, null]);
-  const [uploadingSlot, setUploadingSlot] = useState<number | null>(null);
-  const [showEditor, setShowEditor] = useState(false);
-  const [editingTrack, setEditingTrack] = useState<Track | null>(null);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-
-  // Only pass tracks with actual audio files to the player
-  const playableTracks = useMemo(() => trackSlots.filter((t): t is Track => t !== null && !!t.file_url), [trackSlots]);
-
+const FullscreenVisualizer = () => {
   const {
+    tracks,
     isPlaying,
     currentTrackIndex,
     currentTime,
@@ -74,47 +34,12 @@ const FullscreenVisualizer = ({ isOpen, onClose }: FullscreenVisualizerProps) =>
     seek,
     setVolume,
     currentTrack,
-  } = useAudioPlayer(playableTracks);
+    isVisualizerOpen,
+    closeVisualizer,
+    minimizePlayer,
+  } = useAudioPlayerContext();
 
-  const fetchTracks = useCallback(async () => {
-    const { data, error } = await supabase
-      .from('audio_tracks')
-      .select('*')
-      .order('created_at', { ascending: true });
-
-    if (!error && data) {
-      // Map tracks to slots based on description (Track slot 0, Track slot 1, Track slot 2)
-      const newSlots: (Track | null)[] = [null, null, null];
-      
-      data.forEach(t => {
-        const track: Track = {
-          id: t.id,
-          title: t.title,
-          frequency: t.frequency || '',
-          duration: t.duration || '0:00',
-          file_url: t.file_url,
-          description: t.description || undefined,
-        };
-        
-        // Parse slot index from description
-        const match = t.description?.match(/Track slot (\d+)/);
-        if (match) {
-          const slotIndex = parseInt(match[1], 10);
-          if (slotIndex >= 0 && slotIndex < 3) {
-            newSlots[slotIndex] = track;
-          }
-        }
-      });
-      
-      setTrackSlots(newSlots);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (isOpen) {
-      fetchTracks();
-    }
-  }, [isOpen, fetchTracks]);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   const toggleFullscreen = useCallback(async () => {
     if (!document.fullscreenElement) {
@@ -134,43 +59,9 @@ const FullscreenVisualizer = ({ isOpen, onClose }: FullscreenVisualizerProps) =>
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, []);
 
-  const hasPlayableTracks = playableTracks.length > 0;
+  const hasPlayableTracks = tracks.length > 0;
 
-  // Get playable index for a slot
-  const getPlayableIndex = (slotIndex: number): number => {
-    let playableIdx = 0;
-    for (let i = 0; i < slotIndex; i++) {
-      if (trackSlots[i] !== null) playableIdx++;
-    }
-    return playableIdx;
-  };
-
-  const deleteTrack = async (track: Track) => {
-    try {
-      // Delete from database
-      const { error: dbError } = await supabase
-        .from('audio_tracks')
-        .delete()
-        .eq('id', track.id);
-
-      if (dbError) throw dbError;
-
-      // Try to delete from storage (extract filename from URL)
-      const urlParts = track.file_url.split('/');
-      const fileName = urlParts[urlParts.length - 1];
-      if (fileName) {
-        await supabase.storage.from('audio-tracks').remove([fileName]);
-      }
-
-      toast.success('Track deleted successfully');
-      fetchTracks();
-    } catch (error) {
-      console.error('Delete error:', error);
-      toast.error('Failed to delete track');
-    }
-  };
-
-  if (!isOpen) return null;
+  if (!isVisualizerOpen) return null;
 
   return (
     <AnimatePresence>
@@ -185,7 +76,10 @@ const FullscreenVisualizer = ({ isOpen, onClose }: FullscreenVisualizerProps) =>
           <Button variant="ghost" size="icon" onClick={toggleFullscreen}>
             {isFullscreen ? <Minimize2 className="h-5 w-5" /> : <Maximize2 className="h-5 w-5" />}
           </Button>
-          <Button variant="ghost" size="icon" onClick={onClose}>
+          <Button variant="ghost" size="icon" onClick={minimizePlayer} title="Minimize (keep playing)">
+            <Minimize2 className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={closeVisualizer}>
             <X className="h-5 w-5" />
           </Button>
         </div>
@@ -199,25 +93,15 @@ const FullscreenVisualizer = ({ isOpen, onClose }: FullscreenVisualizerProps) =>
           />
         </div>
 
-        {/* Hero Images Display - 3 track slots */}
+        {/* Hero Images Display */}
         <div className="absolute top-8 left-1/2 -translate-x-1/2 flex gap-8 z-10">
           {trackImages.map((img, index) => {
-            const slotTrack = trackSlots[index];
-            const hasAudio = slotTrack !== null;
-            const playableIdx = hasAudio ? getPlayableIndex(index) : -1;
-            const isCurrentlyPlaying = hasAudio && currentTrackIndex === playableIdx;
+            const isCurrentlyPlaying = currentTrackIndex === index;
             
             return (
-              <motion.div
-                key={index}
-                className="flex flex-col items-center gap-2"
-              >
+              <motion.div key={index} className="flex flex-col items-center gap-2">
                 <motion.button
-                  onClick={() => {
-                    if (hasAudio) {
-                      skipTo(playableIdx);
-                    }
-                  }}
+                  onClick={() => skipTo(index)}
                   className={`relative rounded-lg overflow-hidden transition-all ${
                     isCurrentlyPlaying ? 'ring-2 ring-primary scale-110' : 'opacity-60 hover:opacity-100'
                   }`}
@@ -226,7 +110,7 @@ const FullscreenVisualizer = ({ isOpen, onClose }: FullscreenVisualizerProps) =>
                 >
                   <img
                     src={img}
-                    alt={slotTrack?.title || defaultSlots[index].title}
+                    alt={tracks[index]?.title || defaultSlots[index].title}
                     className="w-28 h-28 md:w-36 md:h-36 object-cover"
                   />
                   {isCurrentlyPlaying && isPlaying && (
@@ -235,7 +119,6 @@ const FullscreenVisualizer = ({ isOpen, onClose }: FullscreenVisualizerProps) =>
                     </div>
                   )}
                 </motion.button>
-                
               </motion.div>
             );
           })}
@@ -309,34 +192,11 @@ const FullscreenVisualizer = ({ isOpen, onClose }: FullscreenVisualizerProps) =>
 
             {!hasPlayableTracks && (
               <p className="text-center text-muted-foreground mt-2 text-xs">
-                Click on a track slot above to upload audio
+                No tracks available
               </p>
             )}
-
           </div>
         </motion.div>
-
-        {uploadingSlot !== null && (
-          <TrackSlotUploader
-            slotIndex={uploadingSlot}
-            defaultTitle={defaultSlots[uploadingSlot].title}
-            defaultFrequency={defaultSlots[uploadingSlot].frequency}
-            existingTrack={trackSlots[uploadingSlot]}
-            onUploadComplete={fetchTracks}
-            onClose={() => setUploadingSlot(null)}
-          />
-        )}
-
-        {showEditor && editingTrack && (
-          <TrackEditor
-            track={editingTrack}
-            onSave={fetchTracks}
-            onClose={() => {
-              setShowEditor(false);
-              setEditingTrack(null);
-            }}
-          />
-        )}
       </motion.div>
     </AnimatePresence>
   );
