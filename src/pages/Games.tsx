@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import GamesMusicWidget from "@/components/GamesMusicWidget";
 import MetatronMatcher from "@/components/games/MetatronMatcher";
 import PinealRunner from "@/components/games/PinealRunner";
 import VoidClicker from "@/components/games/VoidClicker";
@@ -14,7 +15,6 @@ import BallzOfBeing from "@/components/games/BallzOfBeing";
 import ToonToroids from "@/components/games/ToonToroids";
 import { Gamepad2, Trophy, Sparkles, Volume2, VolumeX } from "lucide-react";
 import { useGameSounds } from "@/hooks/useGameSounds";
-
 const games = [
   { id: "metatron", name: "Metatron Matcher", component: MetatronMatcher, description: "Match sacred geometry orbs", badge: "Cube Awakener" },
   { id: "pineal", name: "Pineal Runner", component: PinealRunner, description: "Endless fractal run", badge: "Void Surfer" },
@@ -63,6 +63,7 @@ const Games = () => {
   return (
     <main className="min-h-screen bg-background">
       <Navigation />
+      <GamesMusicWidget />
       
       <section className="pt-24 pb-16 px-4">
         <div className="container mx-auto max-w-6xl">
