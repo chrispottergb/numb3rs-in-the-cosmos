@@ -3,9 +3,20 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 
+interface GameSounds {
+  playClick: () => void;
+  playMatch: () => void;
+  playLevelUp: () => void;
+  playBadge: () => void;
+  playCombo: () => void;
+  playFail: () => void;
+}
+
 interface GameProps {
   onEarnBadge: (badge: string) => void;
   badges: string[];
+  soundEnabled?: boolean;
+  gameSounds?: GameSounds;
 }
 
 const GRID_SIZE = 6;
@@ -19,7 +30,7 @@ type Cell = {
   matched: boolean;
 };
 
-const MetatronMatcher = ({ onEarnBadge, badges }: GameProps) => {
+const MetatronMatcher = ({ onEarnBadge, badges, soundEnabled = true, gameSounds }: GameProps) => {
   const [grid, setGrid] = useState<Cell[][]>([]);
   const [selected, setSelected] = useState<{ row: number; col: number } | null>(null);
   const [score, setScore] = useState(() => {
@@ -30,6 +41,12 @@ const MetatronMatcher = ({ onEarnBadge, badges }: GameProps) => {
     const saved = localStorage.getItem("metatron-matches");
     return saved ? parseInt(saved) : 0;
   });
+
+  const playSound = useCallback((sound: keyof GameSounds) => {
+    if (soundEnabled && gameSounds && gameSounds[sound]) {
+      gameSounds[sound]();
+    }
+  }, [soundEnabled, gameSounds]);
 
   const initGrid = useCallback(() => {
     const newGrid: Cell[][] = [];
@@ -65,6 +82,8 @@ const MetatronMatcher = ({ onEarnBadge, badges }: GameProps) => {
   }, [score, matches, badges, onEarnBadge]);
 
   const handleCellClick = (row: number, col: number) => {
+    playSound('playClick');
+    
     if (!selected) {
       setSelected({ row, col });
       const newGrid = [...grid];
@@ -93,6 +112,7 @@ const MetatronMatcher = ({ onEarnBadge, badges }: GameProps) => {
     if (matchedCells.length > 0) {
       clearMatches(newGrid, matchedCells);
     } else {
+      playSound('playFail');
       [newGrid[r1][c1], newGrid[r2][c2]] = [newGrid[r2][c2], newGrid[r1][c1]];
       setGrid(newGrid);
     }
@@ -123,6 +143,13 @@ const MetatronMatcher = ({ onEarnBadge, badges }: GameProps) => {
   const clearMatches = (g: Cell[][], matchedCells: { row: number; col: number }[]) => {
     const newGrid = [...g.map(r => [...r])];
     const uniqueMatches = new Set(matchedCells.map(c => `${c.row}-${c.col}`));
+    
+    // Play match sound, combo if more than 3
+    if (uniqueMatches.size > 3) {
+      playSound('playCombo');
+    } else {
+      playSound('playMatch');
+    }
     
     uniqueMatches.forEach(key => {
       const [row, col] = key.split("-").map(Number);
@@ -169,7 +196,10 @@ const MetatronMatcher = ({ onEarnBadge, badges }: GameProps) => {
             <p className="text-xs text-muted-foreground">Score</p>
           </div>
           <button
-            onClick={() => setGrid(initGrid())}
+            onClick={() => {
+              playSound('playClick');
+              setGrid(initGrid());
+            }}
             className="p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
           >
             <RotateCcw className="w-5 h-5" />

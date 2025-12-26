@@ -1,11 +1,21 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Sparkles, Swords, Users } from "lucide-react";
 import { toast } from "sonner";
 
+interface GameSounds {
+  playClick: () => void;
+  playHit: () => void;
+  playPowerup: () => void;
+  playLevelUp: () => void;
+  playCoin: () => void;
+}
+
 interface GameProps {
   onEarnBadge: (badge: string) => void;
   badges: string[];
+  soundEnabled?: boolean;
+  gameSounds?: GameSounds;
 }
 
 const HEROES = [
@@ -23,7 +33,7 @@ const BOSSES = [
   { name: "Oblivion King", emoji: "👑", hp: 50000 },
 ];
 
-const TorusTapTitans = ({ onEarnBadge, badges }: GameProps) => {
+const TorusTapTitans = ({ onEarnBadge, badges, soundEnabled = true, gameSounds }: GameProps) => {
   const [gold, setGold] = useState(() => {
     const saved = localStorage.getItem("torus-gold");
     return saved ? parseFloat(saved) : 0;
@@ -48,6 +58,12 @@ const TorusTapTitans = ({ onEarnBadge, badges }: GameProps) => {
 
   const dps = HEROES.reduce((sum, h) => sum + (heroes[h.id] || 0) * h.dps, 0);
   const boss = BOSSES[bossIndex % BOSSES.length];
+
+  const playSound = useCallback((sound: keyof GameSounds) => {
+    if (soundEnabled && gameSounds && gameSounds[sound]) {
+      gameSounds[sound]();
+    }
+  }, [soundEnabled, gameSounds]);
 
   useEffect(() => {
     localStorage.setItem("torus-gold", gold.toString());
@@ -84,6 +100,7 @@ const TorusTapTitans = ({ onEarnBadge, badges }: GameProps) => {
   }, [dps, boss.hp]);
 
   const handleTap = () => {
+    playSound('playHit');
     setBossHp(hp => {
       const newHp = hp - tapDamage;
       if (newHp <= 0) {
@@ -95,6 +112,7 @@ const TorusTapTitans = ({ onEarnBadge, badges }: GameProps) => {
   };
 
   const handleBossDefeat = () => {
+    playSound('playLevelUp');
     const reward = Math.floor(boss.hp * 0.5);
     setGold(g => g + reward);
     setBossIndex(i => i + 1);
@@ -105,6 +123,7 @@ const TorusTapTitans = ({ onEarnBadge, badges }: GameProps) => {
 
   const buyHero = (heroId: string, cost: number) => {
     if (gold >= cost) {
+      playSound('playPowerup');
       setGold(g => g - cost);
       setHeroes(h => ({ ...h, [heroId]: (h[heroId] || 0) + 1 }));
     }

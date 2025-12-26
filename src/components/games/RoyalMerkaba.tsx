@@ -3,9 +3,19 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, RotateCcw, Star } from "lucide-react";
 import { toast } from "sonner";
 
+interface GameSounds {
+  playClick: () => void;
+  playMatch: () => void;
+  playCombo: () => void;
+  playLevelUp: () => void;
+  playFail: () => void;
+}
+
 interface GameProps {
   onEarnBadge: (badge: string) => void;
   badges: string[];
+  soundEnabled?: boolean;
+  gameSounds?: GameSounds;
 }
 
 const GRID_SIZE = 5;
@@ -19,7 +29,7 @@ type Cell = {
   matched: boolean;
 };
 
-const RoyalMerkaba = ({ onEarnBadge, badges }: GameProps) => {
+const RoyalMerkaba = ({ onEarnBadge, badges, soundEnabled = true, gameSounds }: GameProps) => {
   const [grid, setGrid] = useState<Cell[][]>([]);
   const [selected, setSelected] = useState<{ row: number; col: number } | null>(null);
   const [level, setLevel] = useState(() => {
@@ -29,6 +39,12 @@ const RoyalMerkaba = ({ onEarnBadge, badges }: GameProps) => {
   const [moves, setMoves] = useState(20);
   const [score, setScore] = useState(0);
   const [targetScore, setTargetScore] = useState(100);
+
+  const playSound = useCallback((sound: keyof GameSounds) => {
+    if (soundEnabled && gameSounds && gameSounds[sound]) {
+      gameSounds[sound]();
+    }
+  }, [soundEnabled, gameSounds]);
 
   const initGrid = useCallback(() => {
     const newGrid: Cell[][] = [];
@@ -67,11 +83,13 @@ const RoyalMerkaba = ({ onEarnBadge, badges }: GameProps) => {
 
   useEffect(() => {
     if (score >= targetScore) {
+      playSound('playLevelUp');
       toast.success(`Level ${level} Complete!`, {
         description: "Your crystal palace grows stronger!",
       });
       setTimeout(() => setLevel(l => l + 1), 1000);
     } else if (moves <= 0 && score < targetScore) {
+      playSound('playFail');
       toast.error("Level Failed", {
         description: "The density veils prevail...",
       });
@@ -81,10 +99,11 @@ const RoyalMerkaba = ({ onEarnBadge, badges }: GameProps) => {
         setScore(0);
       }, 1000);
     }
-  }, [score, targetScore, moves, level, initGrid]);
+  }, [score, targetScore, moves, level, initGrid, playSound]);
 
   const handleCellClick = (row: number, col: number) => {
     if (moves <= 0) return;
+    playSound('playClick');
     
     if (!selected) {
       setSelected({ row, col });
@@ -115,6 +134,7 @@ const RoyalMerkaba = ({ onEarnBadge, badges }: GameProps) => {
     if (matchedCells.length > 0) {
       clearMatches(newGrid, matchedCells);
     } else {
+      playSound('playFail');
       [newGrid[r1][c1], newGrid[r2][c2]] = [newGrid[r2][c2], newGrid[r1][c1]];
       setGrid(newGrid);
     }
@@ -145,6 +165,13 @@ const RoyalMerkaba = ({ onEarnBadge, badges }: GameProps) => {
   const clearMatches = (g: Cell[][], matchedCells: { row: number; col: number }[]) => {
     const newGrid = [...g.map(r => [...r])];
     const uniqueMatches = new Set(matchedCells.map(c => `${c.row}-${c.col}`));
+    
+    // Play combo sound if more than 3 matches
+    if (uniqueMatches.size > 3) {
+      playSound('playCombo');
+    } else {
+      playSound('playMatch');
+    }
     
     uniqueMatches.forEach(key => {
       const [row, col] = key.split("-").map(Number);
@@ -194,6 +221,7 @@ const RoyalMerkaba = ({ onEarnBadge, badges }: GameProps) => {
           </div>
           <button
             onClick={() => {
+              playSound('playClick');
               setGrid(initGrid());
               setMoves(20 + Math.floor(level / 5) * 5);
               setScore(0);

@@ -3,9 +3,19 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, RotateCcw, Bomb } from "lucide-react";
 import { toast } from "sonner";
 
+interface GameSounds {
+  playClick: () => void;
+  playMatch: () => void;
+  playCombo: () => void;
+  playLevelUp: () => void;
+  playFail: () => void;
+}
+
 interface GameProps {
   onEarnBadge: (badge: string) => void;
   badges: string[];
+  soundEnabled?: boolean;
+  gameSounds?: GameSounds;
 }
 
 const GRID_SIZE = 7;
@@ -18,7 +28,7 @@ type Cell = {
   popping: boolean;
 };
 
-const ToonToroids = ({ onEarnBadge, badges }: GameProps) => {
+const ToonToroids = ({ onEarnBadge, badges, soundEnabled = true, gameSounds }: GameProps) => {
   const [grid, setGrid] = useState<(Cell | null)[][]>([]);
   const [score, setScore] = useState(0);
   const [moves, setMoves] = useState(30);
@@ -28,6 +38,12 @@ const ToonToroids = ({ onEarnBadge, badges }: GameProps) => {
     const saved = localStorage.getItem("toon-combos");
     return saved ? parseInt(saved) : 0;
   });
+
+  const playSound = useCallback((sound: keyof GameSounds) => {
+    if (soundEnabled && gameSounds && gameSounds[sound]) {
+      gameSounds[sound]();
+    }
+  }, [soundEnabled, gameSounds]);
 
   const initGrid = useCallback(() => {
     const newGrid: (Cell | null)[][] = [];
@@ -111,9 +127,12 @@ const ToonToroids = ({ onEarnBadge, badges }: GameProps) => {
       setScore(s => s + Math.floor(points));
       
       if (comboBonus > 0) {
+        playSound('playCombo');
         setCombo(c => c + 1);
         setTotalCombos(t => t + 1);
         toast.success(`Combo x${comboBonus + 1}!`, { duration: 1000 });
+      } else {
+        playSound('playMatch');
       }
 
       // Remove and drop
@@ -146,9 +165,11 @@ const ToonToroids = ({ onEarnBadge, badges }: GameProps) => {
 
   useEffect(() => {
     if (score >= targetScore) {
+      playSound('playLevelUp');
       toast.success(`Level ${level} Complete!`);
       setTimeout(() => setLevel(l => l + 1), 1000);
     } else if (moves <= 0 && score < targetScore) {
+      playSound('playFail');
       toast.error("Level Failed!");
       setTimeout(() => {
         setGrid(initGrid());
@@ -156,7 +177,7 @@ const ToonToroids = ({ onEarnBadge, badges }: GameProps) => {
         setScore(0);
       }, 1000);
     }
-  }, [score, targetScore, moves, level, initGrid]);
+  }, [score, targetScore, moves, level, initGrid, playSound]);
 
   return (
     <div className="p-4 md:p-6">
@@ -172,6 +193,7 @@ const ToonToroids = ({ onEarnBadge, badges }: GameProps) => {
           </div>
           <button
             onClick={() => {
+              playSound('playClick');
               setGrid(initGrid());
               setMoves(30 + level * 5);
               setScore(0);

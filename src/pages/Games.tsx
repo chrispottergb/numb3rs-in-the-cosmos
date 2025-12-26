@@ -12,7 +12,8 @@ import RoyalMerkaba from "@/components/games/RoyalMerkaba";
 import EggOfOmniscience from "@/components/games/EggOfOmniscience";
 import BallzOfBeing from "@/components/games/BallzOfBeing";
 import ToonToroids from "@/components/games/ToonToroids";
-import { Gamepad2, Trophy, Sparkles } from "lucide-react";
+import { Gamepad2, Trophy, Sparkles, Volume2, VolumeX } from "lucide-react";
+import { useGameSounds } from "@/hooks/useGameSounds";
 
 const games = [
   { id: "metatron", name: "Metatron Matcher", component: MetatronMatcher, description: "Match sacred geometry orbs", badge: "Cube Awakener" },
@@ -29,17 +30,30 @@ const games = [
 
 const Games = () => {
   const [activeGame, setActiveGame] = useState<string | null>(null);
+  const [soundEnabled, setSoundEnabled] = useState(true);
   const [badges, setBadges] = useState<string[]>(() => {
     const saved = localStorage.getItem("sacred-badges");
     return saved ? JSON.parse(saved) : [];
   });
+
+  const gameSounds = useGameSounds();
 
   const earnBadge = (badge: string) => {
     if (!badges.includes(badge)) {
       const newBadges = [...badges, badge];
       setBadges(newBadges);
       localStorage.setItem("sacred-badges", JSON.stringify(newBadges));
+      if (soundEnabled) {
+        gameSounds.playBadge();
+      }
     }
+  };
+
+  const handleGameSelect = (gameId: string) => {
+    if (soundEnabled) {
+      gameSounds.playClick();
+    }
+    setActiveGame(gameId);
   };
 
   const ActiveGameComponent = activeGame 
@@ -70,12 +84,25 @@ const Games = () => {
               Earn badges to unlock exclusive frequency tracks.
             </p>
             
-            {/* Badge Counter */}
-            <div className="mt-6 flex items-center justify-center gap-2">
-              <Trophy className="w-5 h-5 text-accent" />
-              <span className="text-accent font-medium">
-                {badges.length} / {games.length} Badges Earned
-              </span>
+            {/* Badge Counter & Sound Toggle */}
+            <div className="mt-6 flex items-center justify-center gap-4">
+              <div className="flex items-center gap-2">
+                <Trophy className="w-5 h-5 text-accent" />
+                <span className="text-accent font-medium">
+                  {badges.length} / {games.length} Badges Earned
+                </span>
+              </div>
+              <button
+                onClick={() => setSoundEnabled(!soundEnabled)}
+                className="p-2 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                title={soundEnabled ? "Mute sounds" : "Enable sounds"}
+              >
+                {soundEnabled ? (
+                  <Volume2 className="w-5 h-5 text-accent" />
+                ) : (
+                  <VolumeX className="w-5 h-5 text-muted-foreground" />
+                )}
+              </button>
             </div>
           </motion.div>
 
@@ -87,13 +114,21 @@ const Games = () => {
               className="mb-8"
             >
               <button
-                onClick={() => setActiveGame(null)}
+                onClick={() => {
+                  if (soundEnabled) gameSounds.playClick();
+                  setActiveGame(null);
+                }}
                 className="mb-4 text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-2"
               >
                 ← Back to Portal
               </button>
               <div className="bg-card/50 rounded-2xl border border-border/50 overflow-hidden">
-                <ActiveGameComponent onEarnBadge={earnBadge} badges={badges} />
+                <ActiveGameComponent 
+                  onEarnBadge={earnBadge} 
+                  badges={badges} 
+                  soundEnabled={soundEnabled}
+                  gameSounds={gameSounds}
+                />
               </div>
             </motion.div>
           ) : (
@@ -109,7 +144,7 @@ const Games = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05 }}
-                  onClick={() => setActiveGame(game.id)}
+                  onClick={() => handleGameSelect(game.id)}
                   className="group relative p-4 bg-card/50 rounded-xl border border-border/50 hover:border-primary/50 transition-all duration-300 text-left"
                 >
                   {/* Glow effect */}
