@@ -3,30 +3,32 @@ import { useAudioPlayerContext } from '@/contexts/AudioPlayerContext';
 
 type SoundType = 'click' | 'match' | 'levelUp' | 'badge' | 'combo' | 'powerup' | 'fail' | 'coin' | 'jump' | 'hit';
 
+// Softer, more pleasant frequencies (musical notes)
 const FREQUENCIES: Record<SoundType, number[]> = {
-  click: [440, 880],
-  match: [523, 659, 784],
-  levelUp: [392, 523, 659, 784, 1047],
-  badge: [523, 659, 784, 1047, 1319],
-  combo: [440, 554, 659],
-  powerup: [262, 330, 392, 523],
-  fail: [200, 150],
-  coin: [1047, 1319],
-  jump: [262, 392],
-  hit: [150, 100],
+  click: [523], // C5 - single soft click
+  match: [392, 523, 659], // G4, C5, E5 - pleasant chord
+  levelUp: [523, 659, 784], // C5, E5, G5 - major chord ascending
+  badge: [392, 494, 587, 784], // G4, B4, D5, G5 - triumphant
+  combo: [440, 523, 659], // A4, C5, E5 - minor feel
+  powerup: [330, 392, 494], // E4, G4, B4 - power chord
+  fail: [294, 262], // D4, C4 - descending
+  coin: [784, 988], // G5, B5 - high ping
+  jump: [330, 440], // E4, A4 - bounce
+  hit: [196, 165], // G3, E3 - low thump
 };
 
+// Shorter, snappier durations
 const DURATIONS: Record<SoundType, number> = {
-  click: 50,
-  match: 150,
-  levelUp: 400,
-  badge: 600,
-  combo: 200,
-  powerup: 300,
-  fail: 200,
-  coin: 100,
-  jump: 80,
-  hit: 100,
+  click: 30,
+  match: 120,
+  levelUp: 250,
+  badge: 400,
+  combo: 150,
+  powerup: 200,
+  fail: 150,
+  coin: 60,
+  jump: 50,
+  hit: 60,
 };
 
 export const useGameSounds = () => {
@@ -49,7 +51,7 @@ export const useGameSounds = () => {
 
       const frequencies = FREQUENCIES[type];
       const duration = DURATIONS[type] / 1000;
-      const baseVolume = isPlaying ? volume * 0.3 : volume * 0.5; // Lower if music is playing
+      const baseVolume = isPlaying ? volume * 0.15 : volume * 0.25; // Much quieter overall
       
       frequencies.forEach((freq, index) => {
         const oscillator = ctx.createOscillator();
@@ -59,7 +61,7 @@ export const useGameSounds = () => {
         gainNode.connect(ctx.destination);
         
         oscillator.frequency.value = freq;
-        oscillator.type = type === 'fail' || type === 'hit' ? 'sawtooth' : 'sine';
+        oscillator.type = 'sine'; // Always use soft sine waves
         
         const startTime = ctx.currentTime + (index * duration / frequencies.length);
         const endTime = startTime + duration / frequencies.length;
