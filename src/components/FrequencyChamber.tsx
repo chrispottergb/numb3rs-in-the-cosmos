@@ -4,6 +4,7 @@ import { Play, Maximize2, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import FullscreenVisualizer from "./FullscreenVisualizer";
 import AudioUploader from "./AudioUploader";
+import { useAudioPlayerContext } from "@/contexts/AudioPlayerContext";
 import flowerOfLife from "@/assets/flower-of-life.png";
 import metatronsCube from "@/assets/metatrons-cube.png";
 import torusField from "@/assets/torus-field.png";
@@ -33,9 +34,9 @@ const tracks = [
 ];
 
 const FrequencyChamber = () => {
-  const [showVisualizer, setShowVisualizer] = useState(false);
   const [showUploader, setShowUploader] = useState(false);
   const [hoveredTrack, setHoveredTrack] = useState<number | null>(null);
+  const { openVisualizer } = useAudioPlayerContext();
 
   return (
     <>
@@ -74,7 +75,7 @@ const FrequencyChamber = () => {
                 className="relative group cursor-pointer"
                 onMouseEnter={() => setHoveredTrack(index)}
                 onMouseLeave={() => setHoveredTrack(null)}
-                onClick={() => setShowVisualizer(true)}
+                onClick={openVisualizer}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
@@ -113,7 +114,7 @@ const FrequencyChamber = () => {
             <Button
               variant="sacred"
               size="xl"
-              onClick={() => setShowVisualizer(true)}
+              onClick={openVisualizer}
             >
               <Maximize2 className="h-5 w-5 mr-2" />
               Open Fullscreen Visualizer
@@ -130,10 +131,7 @@ const FrequencyChamber = () => {
         </div>
       </section>
 
-      <FullscreenVisualizer
-        isOpen={showVisualizer}
-        onClose={() => setShowVisualizer(false)}
-      />
+      <FullscreenVisualizer />
 
       {showUploader && (
         <AudioUploader
