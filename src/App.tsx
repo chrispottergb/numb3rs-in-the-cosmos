@@ -9,6 +9,7 @@ import Splash from "./pages/Splash";
 import Index from "./pages/Index";
 import Merch from "./pages/Merch";
 import Science from "./pages/Science";
+import Games from "./pages/Games";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => (
             <Route path="/home" element={<Index />} />
             <Route path="/merch" element={<Merch />} />
             <Route path="/science" element={<Science />} />
+            <Route path="/games" element={<Games />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

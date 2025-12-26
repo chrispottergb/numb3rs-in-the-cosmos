@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Menu, Gamepad2 } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -33,7 +33,7 @@ const Navigation = () => {
         </Link>
 
         {/* Desktop Navigation Links */}
-        <div className="hidden md:flex items-center gap-8">
+        <div className="hidden md:flex items-center gap-6">
           <Link
             to="/science"
             className="text-sm text-muted-foreground hover:text-primary transition-colors font-medium tracking-wide"
@@ -46,6 +46,16 @@ const Navigation = () => {
           >
             <span className="absolute inset-0 rounded-full bg-primary/20 blur-md animate-pulse" />
             <span className="relative">🛒 Merch</span>
+          </Link>
+          <Link
+            to="/games"
+            className="relative text-sm font-medium tracking-wide px-4 py-2 rounded-full bg-accent/20 text-accent border border-accent/50 hover:bg-accent/30 hover:border-accent transition-all duration-300"
+          >
+            <span className="absolute inset-0 rounded-full bg-accent/20 blur-md" />
+            <span className="relative flex items-center gap-2">
+              <Gamepad2 className="w-4 h-4" />
+              GAMES
+            </span>
           </Link>
           {navLinks.map((link) => (
             <a
@@ -75,6 +85,18 @@ const Navigation = () => {
                 >
                   <span className="absolute inset-0 rounded-full bg-primary/20 blur-md animate-pulse" />
                   <span className="relative">🛒 Merch</span>
+                </Link>
+              </SheetClose>
+
+              {/* GAMES Button */}
+              <SheetClose asChild>
+                <Link
+                  to="/games"
+                  className="relative text-lg font-medium tracking-wide px-6 py-3 rounded-full bg-accent/20 text-accent border border-accent/50 hover:bg-accent/30 hover:border-accent transition-all duration-300 text-center flex items-center justify-center gap-2"
+                >
+                  <span className="absolute inset-0 rounded-full bg-accent/20 blur-md" />
+                  <Gamepad2 className="w-5 h-5 relative" />
+                  <span className="relative">GAMES</span>
                 </Link>
               </SheetClose>
 
