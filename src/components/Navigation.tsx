@@ -104,9 +104,9 @@ const Navigation = () => {
                 </div>
               ) : (
                 <Link to="/auth">
-                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                  <Button variant="outline" size="sm" className="border-primary/50 text-primary hover:bg-primary/10">
                     <LogIn className="w-4 h-4 mr-2" />
-                    Sign In
+                    Sign In / Sign Up
                   </Button>
                 </Link>
               )}
