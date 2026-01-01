@@ -9,8 +9,8 @@ import {
   SheetClose,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
 
 const navLinks = [
   { name: "Resonance Room", href: "#resonance-room" },
