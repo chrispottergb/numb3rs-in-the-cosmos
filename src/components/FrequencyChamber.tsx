@@ -6,6 +6,8 @@ import FullscreenVisualizer from "./FullscreenVisualizer";
 import AudioUploader from "./AudioUploader";
 import TrackAdmin from "./TrackAdmin";
 import { useAudioPlayerContext } from "@/contexts/AudioPlayerContext";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
 import flowerOfLife from "@/assets/flower-of-life.png";
 import metatronsCube from "@/assets/metatrons-cube.png";
 import torusField from "@/assets/torus-field.png";
@@ -39,6 +41,31 @@ const FrequencyChamber = () => {
   const [showAdmin, setShowAdmin] = useState(false);
   const [hoveredTrack, setHoveredTrack] = useState<number | null>(null);
   const { openVisualizer } = useAudioPlayerContext();
+  const { user, isAdmin, loading } = useAuth();
+
+  const handleUploadClick = () => {
+    if (!user) {
+      toast.error('Please sign in to upload tracks');
+      return;
+    }
+    if (!isAdmin) {
+      toast.error('Only admins can upload tracks');
+      return;
+    }
+    setShowUploader(true);
+  };
+
+  const handleManageClick = () => {
+    if (!user) {
+      toast.error('Please sign in to manage tracks');
+      return;
+    }
+    if (!isAdmin) {
+      toast.error('Only admins can manage tracks');
+      return;
+    }
+    setShowAdmin(true);
+  };
 
   return (
     <>
@@ -121,22 +148,26 @@ const FrequencyChamber = () => {
               <Maximize2 className="h-5 w-5 mr-2" />
               Open Fullscreen Visualizer
             </Button>
-            <Button
-              variant="hermetic"
-              size="xl"
-              onClick={() => setShowUploader(true)}
-            >
-              <Upload className="h-5 w-5 mr-2" />
-              Upload Your Music
-            </Button>
-            <Button
-              variant="outline"
-              size="xl"
-              onClick={() => setShowAdmin(true)}
-            >
-              <Settings className="h-5 w-5 mr-2" />
-              Manage Tracks
-            </Button>
+            {isAdmin && (
+              <>
+                <Button
+                  variant="hermetic"
+                  size="xl"
+                  onClick={handleUploadClick}
+                >
+                  <Upload className="h-5 w-5 mr-2" />
+                  Upload Music
+                </Button>
+                <Button
+                  variant="outline"
+                  size="xl"
+                  onClick={handleManageClick}
+                >
+                  <Settings className="h-5 w-5 mr-2" />
+                  Manage Tracks
+                </Button>
+              </>
+            )}
           </motion.div>
         </div>
       </section>

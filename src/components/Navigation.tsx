@@ -1,13 +1,16 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
-import { Menu, Gamepad2 } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Menu, Gamepad2, LogIn, LogOut, User } from "lucide-react";
 import {
   Sheet,
   SheetContent,
   SheetTrigger,
   SheetClose,
 } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
 
 const navLinks = [
   { name: "Resonance Room", href: "#resonance-room" },
@@ -15,6 +18,18 @@ const navLinks = [
 
 const Navigation = () => {
   const [open, setOpen] = useState(false);
+  const { user, isAdmin, signOut, loading } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    const { error } = await signOut();
+    if (error) {
+      toast.error('Failed to sign out');
+    } else {
+      toast.success('Signed out successfully');
+      navigate('/home');
+    }
+  };
 
   return (
     <motion.header
@@ -66,6 +81,37 @@ const Navigation = () => {
               {link.name}
             </a>
           ))}
+
+          {/* Auth Section */}
+          {!loading && (
+            <>
+              {user ? (
+                <div className="flex items-center gap-3">
+                  {isAdmin && (
+                    <span className="text-xs px-2 py-1 bg-primary/20 text-primary rounded-full">
+                      Admin
+                    </span>
+                  )}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleSignOut}
+                    className="text-muted-foreground hover:text-foreground"
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Sign Out
+                  </Button>
+                </div>
+              ) : (
+                <Link to="/auth">
+                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                    <LogIn className="w-4 h-4 mr-2" />
+                    Sign In
+                  </Button>
+                </Link>
+              )}
+            </>
+          )}
         </div>
 
         {/* Mobile menu drawer */}
@@ -77,6 +123,46 @@ const Navigation = () => {
           </SheetTrigger>
           <SheetContent side="right" className="w-[280px] bg-background/95 backdrop-blur-xl border-border/50">
             <div className="flex flex-col gap-6 pt-8">
+              {/* Auth Section Mobile */}
+              {!loading && (
+                <>
+                  {user ? (
+                    <div className="flex flex-col gap-2 pb-4 border-b border-border/30">
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <User className="w-4 h-4" />
+                        <span className="text-sm truncate">{user.email}</span>
+                      </div>
+                      {isAdmin && (
+                        <span className="text-xs px-2 py-1 bg-primary/20 text-primary rounded-full w-fit">
+                          Admin
+                        </span>
+                      )}
+                      <SheetClose asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={handleSignOut}
+                          className="justify-start px-0 text-muted-foreground hover:text-foreground"
+                        >
+                          <LogOut className="w-4 h-4 mr-2" />
+                          Sign Out
+                        </Button>
+                      </SheetClose>
+                    </div>
+                  ) : (
+                    <SheetClose asChild>
+                      <Link
+                        to="/auth"
+                        className="flex items-center gap-2 text-lg text-primary font-medium py-2"
+                      >
+                        <LogIn className="w-5 h-5" />
+                        Sign In
+                      </Link>
+                    </SheetClose>
+                  )}
+                </>
+              )}
+
               {/* Highlighted Merch Button */}
               <SheetClose asChild>
                 <Link
