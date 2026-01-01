@@ -71,28 +71,16 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
       .order('created_at', { ascending: true });
 
     if (!error && data) {
-      const loadedTracks: Track[] = [];
+      const loadedTracks: Track[] = data.map(t => ({
+        id: t.id,
+        title: t.title,
+        frequency: t.frequency || '',
+        duration: t.duration || '0:00',
+        file_url: t.file_url,
+        description: t.description || undefined,
+      }));
       
-      data.forEach(t => {
-        const track: Track = {
-          id: t.id,
-          title: t.title,
-          frequency: t.frequency || '',
-          duration: t.duration || '0:00',
-          file_url: t.file_url,
-          description: t.description || undefined,
-        };
-        
-        const match = t.description?.match(/Track slot (\d+)/);
-        if (match) {
-          const slotIndex = parseInt(match[1], 10);
-          if (slotIndex >= 0 && slotIndex < 3) {
-            loadedTracks[slotIndex] = track;
-          }
-        }
-      });
-      
-      setTracks(loadedTracks.filter(Boolean));
+      setTracks(loadedTracks);
     }
   }, []);
 

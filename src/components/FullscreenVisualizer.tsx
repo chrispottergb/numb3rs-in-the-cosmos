@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Play, Pause, SkipBack, SkipForward, Volume2, Maximize2, Minimize2, Music } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -6,17 +6,23 @@ import { Slider } from '@/components/ui/slider';
 import SacredGeometryVisualizer from './SacredGeometryVisualizer';
 import WaveformProgress from './WaveformProgress';
 import { useAudioPlayerContext } from '@/contexts/AudioPlayerContext';
+
+// Default images for tracks
 import flowerOfLife from '@/assets/flower-of-life.png';
 import metatronsCube from '@/assets/metatrons-cube.png';
 import torusField from '@/assets/torus-field.png';
+import sriYantra from '@/assets/sri-yantra.png';
+import vesicaPiscis from '@/assets/vesica-piscis.png';
+import seedOfLife from '@/assets/seed-of-life.png';
 
-const defaultSlots = [
-  { title: "The Spell Breaker", frequency: "528Hz" },
-  { title: "Numb3rs in the Cosmos", frequency: "432Hz" },
-  { title: "Infinity Sign", frequency: "639Hz" },
+const defaultImages = [
+  flowerOfLife,
+  metatronsCube,
+  torusField,
+  sriYantra,
+  vesicaPiscis,
+  seedOfLife,
 ];
-
-const trackImages = [flowerOfLife, metatronsCube, torusField];
 
 const FullscreenVisualizer = () => {
   const {
@@ -61,6 +67,13 @@ const FullscreenVisualizer = () => {
 
   const hasPlayableTracks = tracks.length > 0;
 
+  const getTrackImage = (index: number) => {
+    return defaultImages[index % defaultImages.length];
+  };
+
+  // Only show first 6 track images in the header
+  const visibleTracks = tracks.slice(0, 6);
+
   if (!isVisualizerOpen) return null;
 
   return (
@@ -93,13 +106,13 @@ const FullscreenVisualizer = () => {
           />
         </div>
 
-        {/* Hero Images Display */}
-        <div className="absolute top-8 left-1/2 -translate-x-1/2 flex gap-8 z-10">
-          {trackImages.map((img, index) => {
+        {/* Track Images Display */}
+        <div className="absolute top-8 left-1/2 -translate-x-1/2 flex gap-4 z-10 overflow-x-auto max-w-[90vw] px-4">
+          {visibleTracks.map((track, index) => {
             const isCurrentlyPlaying = currentTrackIndex === index;
             
             return (
-              <motion.div key={index} className="flex flex-col items-center gap-2">
+              <motion.div key={track.id} className="flex flex-col items-center gap-2 flex-shrink-0">
                 <motion.button
                   onClick={() => skipTo(index)}
                   className={`relative rounded-lg overflow-hidden transition-all ${
@@ -109,19 +122,27 @@ const FullscreenVisualizer = () => {
                   whileTap={{ scale: 0.95 }}
                 >
                   <img
-                    src={img}
-                    alt={tracks[index]?.title || defaultSlots[index].title}
-                    className="w-28 h-28 md:w-36 md:h-36 object-cover"
+                    src={getTrackImage(index)}
+                    alt={track.title}
+                    className="w-20 h-20 md:w-28 md:h-28 object-cover"
                   />
                   {isCurrentlyPlaying && isPlaying && (
                     <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
-                      <Music className="h-6 w-6 text-primary animate-pulse" />
+                      <Music className="h-5 w-5 text-primary animate-pulse" />
                     </div>
                   )}
                 </motion.button>
+                <span className="text-xs text-muted-foreground truncate max-w-[80px] text-center">
+                  {track.title}
+                </span>
               </motion.div>
             );
           })}
+          {tracks.length > 6 && (
+            <div className="flex items-center justify-center w-20 h-20 md:w-28 md:h-28 rounded-lg bg-card/50 border border-border text-muted-foreground text-sm">
+              +{tracks.length - 6} more
+            </div>
+          )}
         </div>
 
         {/* Track info overlay */}
@@ -134,10 +155,10 @@ const FullscreenVisualizer = () => {
             {/* Track title */}
             <div className="text-center mb-3">
               <h2 className="text-xl md:text-2xl font-display text-gradient-sacred mb-1">
-                {currentTrack?.title || defaultSlots[0].title}
+                {currentTrack?.title || 'No track selected'}
               </h2>
               <p className="text-primary text-glow-cyan text-sm">
-                {currentTrack?.frequency || defaultSlots[0].frequency}
+                {currentTrack?.frequency || ''}
               </p>
             </div>
 
