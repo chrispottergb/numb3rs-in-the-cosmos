@@ -8,40 +8,30 @@ import TrackAdmin from "./TrackAdmin";
 import { useAudioPlayerContext } from "@/contexts/AudioPlayerContext";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+
+// Default images for tracks
 import flowerOfLife from "@/assets/flower-of-life.png";
 import metatronsCube from "@/assets/metatrons-cube.png";
 import torusField from "@/assets/torus-field.png";
+import sriYantra from "@/assets/sri-yantra.png";
+import vesicaPiscis from "@/assets/vesica-piscis.png";
+import seedOfLife from "@/assets/seed-of-life.png";
 
-const tracks = [
-  { 
-    id: 1, 
-    title: "The Spell Breaker", 
-    frequency: "528Hz", 
-    description: "Hexagonal structure of 528Hz",
-    image: flowerOfLife,
-  },
-  { 
-    id: 2, 
-    title: "Numb3rs in the Cosmos", 
-    frequency: "432Hz", 
-    description: "Golden Spiral",
-    image: metatronsCube,
-  },
-  { 
-    id: 3, 
-    title: "Infinity Sign", 
-    frequency: "639Hz", 
-    description: "Torus field",
-    image: torusField,
-  },
+const defaultImages = [
+  flowerOfLife,
+  metatronsCube,
+  torusField,
+  sriYantra,
+  vesicaPiscis,
+  seedOfLife,
 ];
 
 const FrequencyChamber = () => {
   const [showUploader, setShowUploader] = useState(false);
   const [showAdmin, setShowAdmin] = useState(false);
   const [hoveredTrack, setHoveredTrack] = useState<number | null>(null);
-  const { openVisualizer } = useAudioPlayerContext();
-  const { user, isAdmin, loading } = useAuth();
+  const { openVisualizer, tracks, skipTo, fetchTracks } = useAudioPlayerContext();
+  const { user, isAdmin } = useAuth();
 
   const handleUploadClick = () => {
     if (!user) {
@@ -67,6 +57,15 @@ const FrequencyChamber = () => {
     setShowAdmin(true);
   };
 
+  const handleTrackClick = (index: number) => {
+    skipTo(index);
+    openVisualizer();
+  };
+
+  const getTrackImage = (index: number) => {
+    return defaultImages[index % defaultImages.length];
+  };
+
   return (
     <>
       <section className="relative py-24 overflow-hidden" id="frequency-chamber">
@@ -90,46 +89,66 @@ const FrequencyChamber = () => {
             </p>
           </motion.div>
 
-          {/* 3 Hero Images Grid */}
+          {/* Dynamic Track Grid */}
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
-            className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto mb-12"
+            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-6xl mx-auto mb-12"
           >
-            {tracks.map((track, index) => (
-              <motion.div
-                key={track.id}
-                className="relative group cursor-pointer"
-                onMouseEnter={() => setHoveredTrack(index)}
-                onMouseLeave={() => setHoveredTrack(null)}
-                onClick={openVisualizer}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <div className="relative aspect-square rounded-xl overflow-hidden border-hermetic bg-card/50 backdrop-blur-sm">
-                  <img
-                    src={track.image}
-                    alt={track.title}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                  
-                  {/* Overlay */}
-                  <div className={`absolute inset-0 bg-background/60 transition-opacity duration-300 ${
-                    hoveredTrack === index ? 'opacity-100' : 'opacity-0'
-                  }`}>
-                    <div className="absolute inset-0 flex flex-col items-center justify-center">
-                      <Play className="h-12 w-12 text-primary mb-4" />
-                      <span className="text-primary font-display text-xl">Enter Chamber</span>
+            {tracks.length > 0 ? (
+              tracks.map((track, index) => (
+                <motion.div
+                  key={track.id}
+                  className="relative group cursor-pointer"
+                  onMouseEnter={() => setHoveredTrack(index)}
+                  onMouseLeave={() => setHoveredTrack(null)}
+                  onClick={() => handleTrackClick(index)}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <div className="relative aspect-square rounded-xl overflow-hidden border-hermetic bg-card/50 backdrop-blur-sm">
+                    <img
+                      src={getTrackImage(index)}
+                      alt={track.title}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                    
+                    {/* Overlay */}
+                    <div className={`absolute inset-0 bg-background/60 transition-opacity duration-300 ${
+                      hoveredTrack === index ? 'opacity-100' : 'opacity-0'
+                    }`}>
+                      <div className="absolute inset-0 flex flex-col items-center justify-center p-4">
+                        <Play className="h-10 w-10 text-primary mb-2" />
+                        <span className="text-primary font-display text-sm text-center">Enter Chamber</span>
+                      </div>
                     </div>
+
+                    {/* Glow effect */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent pointer-events-none" />
                   </div>
 
-                  {/* Glow effect */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent pointer-events-none" />
-                </div>
-              </motion.div>
-            ))}
+                  {/* Track Info */}
+                  <div className="mt-3 text-center">
+                    <h3 className="text-sm font-display text-foreground truncate">{track.title}</h3>
+                    {track.frequency && (
+                      <p className="text-xs text-primary text-glow-cyan">{track.frequency}</p>
+                    )}
+                  </div>
+                </motion.div>
+              ))
+            ) : (
+              <div className="col-span-full text-center py-12">
+                <p className="text-muted-foreground">No tracks available yet.</p>
+                {isAdmin && (
+                  <p className="text-sm text-muted-foreground mt-2">Click "Upload Music" to add tracks.</p>
+                )}
+              </div>
+            )}
           </motion.div>
 
           {/* CTA Buttons */}
@@ -176,13 +195,19 @@ const FrequencyChamber = () => {
 
       {showUploader && (
         <AudioUploader
-          onUploadComplete={() => setShowUploader(false)}
+          onUploadComplete={() => {
+            setShowUploader(false);
+            fetchTracks();
+          }}
           onClose={() => setShowUploader(false)}
         />
       )}
 
       {showAdmin && (
-        <TrackAdmin onClose={() => setShowAdmin(false)} />
+        <TrackAdmin onClose={() => {
+          setShowAdmin(false);
+          fetchTracks();
+        }} />
       )}
     </>
   );
