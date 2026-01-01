@@ -1,5 +1,6 @@
 import Navigation from "@/components/Navigation";
 import HeroSection from "@/components/HeroSection";
+import FrequencyChamber from "@/components/FrequencyChamber";
 import ResonanceRoom from "@/components/ResonanceRoom";
 import MerchPreview from "@/components/MerchPreview";
 import Footer from "@/components/Footer";
@@ -9,6 +10,7 @@ const Index = () => {
     <main className="min-h-screen bg-background">
       <Navigation />
       <HeroSection />
+      <FrequencyChamber />
       <ResonanceRoom />
       <MerchPreview />
       <Footer />
