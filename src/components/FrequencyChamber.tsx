@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Play, Maximize2, Upload } from "lucide-react";
+import { Play, Maximize2, Upload, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import FullscreenVisualizer from "./FullscreenVisualizer";
 import AudioUploader from "./AudioUploader";
+import TrackAdmin from "./TrackAdmin";
 import { useAudioPlayerContext } from "@/contexts/AudioPlayerContext";
 import flowerOfLife from "@/assets/flower-of-life.png";
 import metatronsCube from "@/assets/metatrons-cube.png";
@@ -35,6 +36,7 @@ const tracks = [
 
 const FrequencyChamber = () => {
   const [showUploader, setShowUploader] = useState(false);
+  const [showAdmin, setShowAdmin] = useState(false);
   const [hoveredTrack, setHoveredTrack] = useState<number | null>(null);
   const { openVisualizer } = useAudioPlayerContext();
 
@@ -127,6 +129,14 @@ const FrequencyChamber = () => {
               <Upload className="h-5 w-5 mr-2" />
               Upload Your Music
             </Button>
+            <Button
+              variant="outline"
+              size="xl"
+              onClick={() => setShowAdmin(true)}
+            >
+              <Settings className="h-5 w-5 mr-2" />
+              Manage Tracks
+            </Button>
           </motion.div>
         </div>
       </section>
@@ -138,6 +148,10 @@ const FrequencyChamber = () => {
           onUploadComplete={() => setShowUploader(false)}
           onClose={() => setShowUploader(false)}
         />
+      )}
+
+      {showAdmin && (
+        <TrackAdmin onClose={() => setShowAdmin(false)} />
       )}
     </>
   );
