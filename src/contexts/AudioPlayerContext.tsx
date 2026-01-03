@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useRef, useCallback, useEffect, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useMediaSession } from '@/hooks/useMediaSession';
 
 interface Track {
   id: string;
@@ -217,6 +218,19 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
     setIsVisualizerOpen(true);
     setIsMinimized(false);
   }, []);
+
+  // Media Session API for lock screen controls (Safari-compatible, no JS timers)
+  useMediaSession({
+    currentTrack: tracks[currentTrackIndex],
+    isPlaying,
+    currentTime,
+    duration,
+    onPlay: play,
+    onPause: pause,
+    onNext: next,
+    onPrevious: previous,
+    onSeek: seek,
+  });
 
   useEffect(() => {
     if (tracks.length > 0) {
