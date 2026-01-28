@@ -232,15 +232,23 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
     onSeek: seek,
   });
 
+  // Initialize audio when tracks are loaded
   useEffect(() => {
     if (tracks.length > 0) {
       initAudio();
       loadTrack(currentTrackIndex);
-      if (isPlaying && audioRef.current) {
-        audioRef.current.play().catch(console.error);
-      }
     }
-  }, [tracks, currentTrackIndex, initAudio, loadTrack, isPlaying]);
+  }, [tracks.length, currentTrackIndex, initAudio, loadTrack]);
+
+  // Handle track changes while playing
+  const isPlayingRef = useRef(isPlaying);
+  isPlayingRef.current = isPlaying;
+  
+  useEffect(() => {
+    if (tracks.length > 0 && isPlayingRef.current && audioRef.current) {
+      audioRef.current.play().catch(console.error);
+    }
+  }, [currentTrackIndex, tracks.length]);
 
   useEffect(() => {
     fetchTracks();
