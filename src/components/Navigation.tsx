@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
-import { Menu, Gamepad2, LogIn, LogOut, User } from "lucide-react";
+import { Menu, Gamepad2, LogIn, LogOut, User, Shield } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -88,9 +88,13 @@ const Navigation = () => {
               {user ? (
                 <div className="flex items-center gap-3">
                   {isAdmin && (
-                    <span className="text-xs px-2 py-1 bg-primary/20 text-primary rounded-full">
+                    <Link
+                      to="/admin"
+                      className="text-xs px-3 py-1.5 bg-primary/20 text-primary rounded-full hover:bg-primary/30 transition-colors flex items-center gap-1"
+                    >
+                      <Shield className="w-3 h-3" />
                       Admin
-                    </span>
+                    </Link>
                   )}
                   <Button
                     variant="ghost"
@@ -133,9 +137,15 @@ const Navigation = () => {
                         <span className="text-sm truncate">{user.email}</span>
                       </div>
                       {isAdmin && (
-                        <span className="text-xs px-2 py-1 bg-primary/20 text-primary rounded-full w-fit">
-                          Admin
-                        </span>
+                        <SheetClose asChild>
+                          <Link
+                            to="/admin"
+                            className="text-xs px-3 py-1.5 bg-primary/20 text-primary rounded-full w-fit hover:bg-primary/30 transition-colors flex items-center gap-1"
+                          >
+                            <Shield className="w-3 h-3" />
+                            Admin Panel
+                          </Link>
+                        </SheetClose>
                       )}
                       <SheetClose asChild>
                         <Button
