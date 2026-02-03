@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Mail, Lock, User, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Mail, Lock, User, Eye, EyeOff, Loader2, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import { z } from 'zod';
 
 const authSchema = z.object({
@@ -15,40 +16,102 @@ const authSchema = z.object({
   username: z.string().trim().min(2, 'Username must be at least 2 characters').max(50, 'Username too long').optional(),
 });
 
+const emailSchema = z.object({
+  email: z.string().trim().email('Invalid email address').max(255, 'Email too long'),
+});
+
+const passwordSchema = z.object({
+  password: z.string().min(6, 'Password must be at least 6 characters').max(100, 'Password too long'),
+});
+
+type AuthMode = 'signIn' | 'signUp' | 'forgotPassword' | 'resetPassword';
+
 const Auth = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { user, loading, signIn, signUp } = useAuth();
-  const [isSignUp, setIsSignUp] = useState(false);
+  const [mode, setMode] = useState<AuthMode>('signIn');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [username, setUsername] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
+  // Check for password recovery flow
   useEffect(() => {
-    if (user && !loading) {
+    const type = searchParams.get('type');
+    if (type === 'recovery') {
+      setMode('resetPassword');
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (user && !loading && mode !== 'resetPassword') {
       navigate('/home');
     }
-  }, [user, loading, navigate]);
+  }, [user, loading, navigate, mode]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Validate input
-    const validationData = isSignUp 
-      ? { email, password, username: username || undefined }
-      : { email, password };
-    
-    const result = authSchema.safeParse(validationData);
-    if (!result.success) {
-      toast.error(result.error.errors[0].message);
-      return;
-    }
-
     setSubmitting(true);
-    
+
     try {
-      if (isSignUp) {
+      if (mode === 'forgotPassword') {
+        const result = emailSchema.safeParse({ email });
+        if (!result.success) {
+          toast.error(result.error.errors[0].message);
+          return;
+        }
+
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/auth?type=recovery`,
+        });
+
+        if (error) {
+          toast.error(error.message);
+        } else {
+          toast.success('Password reset email sent! Check your inbox.');
+          setMode('signIn');
+        }
+        return;
+      }
+
+      if (mode === 'resetPassword') {
+        const result = passwordSchema.safeParse({ password });
+        if (!result.success) {
+          toast.error(result.error.errors[0].message);
+          return;
+        }
+
+        if (password !== confirmPassword) {
+          toast.error('Passwords do not match');
+          return;
+        }
+
+        const { error } = await supabase.auth.updateUser({ password });
+
+        if (error) {
+          toast.error(error.message);
+        } else {
+          toast.success('Password updated successfully!');
+          navigate('/home');
+        }
+        return;
+      }
+
+      // Sign in / Sign up flow
+      const validationData = mode === 'signUp'
+        ? { email, password, username: username || undefined }
+        : { email, password };
+
+      const result = authSchema.safeParse(validationData);
+      if (!result.success) {
+        toast.error(result.error.errors[0].message);
+        return;
+      }
+
+      if (mode === 'signUp') {
         const { error } = await signUp(email, password, username);
         if (error) {
           if (error.message.includes('already registered')) {
@@ -78,6 +141,24 @@ const Auth = () => {
     }
   };
 
+  const getTitle = () => {
+    switch (mode) {
+      case 'signUp': return 'Create Account';
+      case 'forgotPassword': return 'Reset Password';
+      case 'resetPassword': return 'Set New Password';
+      default: return 'Welcome Back';
+    }
+  };
+
+  const getSubtitle = () => {
+    switch (mode) {
+      case 'signUp': return 'Join the frequency chamber';
+      case 'forgotPassword': return 'Enter your email to receive a reset link';
+      case 'resetPassword': return 'Enter your new password';
+      default: return 'Sign in to continue';
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -95,17 +176,28 @@ const Auth = () => {
         className="w-full max-w-md"
       >
         <div className="bg-card border-hermetic rounded-xl p-8 shadow-sacred">
+          {(mode === 'forgotPassword' || mode === 'resetPassword') && (
+            <button
+              type="button"
+              onClick={() => setMode('signIn')}
+              className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary transition-colors mb-4"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to sign in
+            </button>
+          )}
+
           <div className="text-center mb-8">
             <h1 className="text-3xl font-display text-gradient-sacred mb-2">
-              {isSignUp ? 'Create Account' : 'Welcome Back'}
+              {getTitle()}
             </h1>
             <p className="text-muted-foreground">
-              {isSignUp ? 'Join the frequency chamber' : 'Sign in to continue'}
+              {getSubtitle()}
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {isSignUp && (
+            {mode === 'signUp' && (
               <div>
                 <Label htmlFor="username">Username</Label>
                 <div className="relative mt-1">
@@ -122,44 +214,66 @@ const Auth = () => {
               </div>
             )}
 
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <div className="relative mt-1">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  className="pl-10"
-                  required
-                />
+            {mode !== 'resetPassword' && (
+              <div>
+                <Label htmlFor="email">Email</Label>
+                <div className="relative mt-1">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    className="pl-10"
+                    required
+                  />
+                </div>
               </div>
-            </div>
+            )}
 
-            <div>
-              <Label htmlFor="password">Password</Label>
-              <div className="relative mt-1">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
-                  className="pl-10 pr-10"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
+            {(mode === 'signIn' || mode === 'signUp' || mode === 'resetPassword') && (
+              <div>
+                <Label htmlFor="password">{mode === 'resetPassword' ? 'New Password' : 'Password'}</Label>
+                <div className="relative mt-1">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder={mode === 'resetPassword' ? 'Enter new password' : 'Enter your password'}
+                    className="pl-10 pr-10"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
+
+            {mode === 'resetPassword' && (
+              <div>
+                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <div className="relative mt-1">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="confirmPassword"
+                    type={showPassword ? 'text' : 'password'}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Confirm new password"
+                    className="pl-10 pr-10"
+                    required
+                  />
+                </div>
+              </div>
+            )}
 
             <Button
               type="submit"
@@ -169,23 +283,41 @@ const Auth = () => {
             >
               {submitting ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
-              ) : isSignUp ? (
+              ) : mode === 'signUp' ? (
                 'Create Account'
+              ) : mode === 'forgotPassword' ? (
+                'Send Reset Link'
+              ) : mode === 'resetPassword' ? (
+                'Update Password'
               ) : (
                 'Sign In'
               )}
             </Button>
           </form>
 
-          <div className="mt-6 text-center">
-            <button
-              type="button"
-              onClick={() => setIsSignUp(!isSignUp)}
-              className="text-sm text-muted-foreground hover:text-primary transition-colors"
-            >
-              {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
-            </button>
-          </div>
+          {mode === 'signIn' && (
+            <div className="mt-4 text-center">
+              <button
+                type="button"
+                onClick={() => setMode('forgotPassword')}
+                className="text-sm text-muted-foreground hover:text-primary transition-colors"
+              >
+                Forgot your password?
+              </button>
+            </div>
+          )}
+
+          {(mode === 'signIn' || mode === 'signUp') && (
+            <div className="mt-6 text-center">
+              <button
+                type="button"
+                onClick={() => setMode(mode === 'signIn' ? 'signUp' : 'signIn')}
+                className="text-sm text-muted-foreground hover:text-primary transition-colors"
+              >
+                {mode === 'signUp' ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
+              </button>
+            </div>
+          )}
         </div>
       </motion.div>
     </div>
