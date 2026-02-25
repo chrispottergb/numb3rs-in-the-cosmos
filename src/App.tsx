@@ -12,6 +12,7 @@ import Science from "./pages/Science";
 import Games from "./pages/Games";
 import Auth from "./pages/Auth";
 import Admin from "./pages/Admin";
+import DownloadAssets from "./pages/DownloadAssets";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,6 +32,7 @@ const App = () => (
             <Route path="/games" element={<Games />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/admin" element={<Admin />} />
+            <Route path="/download-assets" element={<DownloadAssets />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
