@@ -38,13 +38,29 @@ const Auth = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  // Check for password recovery flow
+  // Check for password recovery flow via query params or hash fragment
   useEffect(() => {
     const type = searchParams.get('type');
     if (type === 'recovery') {
       setMode('resetPassword');
+      return;
+    }
+    // Also check hash fragment (Supabase puts recovery info there)
+    const hash = window.location.hash;
+    if (hash && hash.includes('type=recovery')) {
+      setMode('resetPassword');
     }
   }, [searchParams]);
+
+  // Listen for PASSWORD_RECOVERY auth event
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        setMode('resetPassword');
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, []);
 
   useEffect(() => {
     if (user && !loading && mode !== 'resetPassword') {
