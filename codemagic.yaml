@@ -9,6 +9,8 @@ workflows:
       node: 18
       xcode: latest
       cocoapods: default
+      groups:
+        - sup
       ios_signing:
         distribution_type: app_store
         bundle_identifier: com.highfrequencyholdings.numb3rs
