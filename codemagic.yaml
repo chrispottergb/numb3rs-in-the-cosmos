@@ -8,12 +8,64 @@ workflows:
     scripts:
       - name: Install dependencies
         script: npm ci
-      - name: Test
-        script: npm run build -- --mode test 2>/dev/null || echo "No test script found, skipping"
       - name: Build
         script: npm run build
     artifacts:
       - dist/**
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: main
+          include: true
+
+  ios-app:
+    name: iOS App Store Deploy
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    integrations:
+      app_store_connect: Numb3rs In The Cosmos
+    environment:
+      node: 18
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: app.lovable.25abfcf66b104783ba1bf16b1610a1ce
+      vars:
+        BUNDLE_ID: "app.lovable.25abfcf66b104783ba1bf16b1610a1ce"
+    scripts:
+      - name: Install dependencies
+        script: npm ci
+      - name: Build web assets
+        script: npm run build
+      - name: Install Capacitor dependencies
+        script: |
+          npx cap sync ios
+      - name: Set up code signing
+        script: |
+          xcode-project use-profiles
+      - name: Build iOS app
+        script: |
+          cd ios/App
+          xcodebuild -workspace App.xcworkspace \
+            -scheme App \
+            -sdk iphoneos \
+            -configuration Release \
+            -archivePath build/App.xcarchive \
+            archive
+      - name: Export IPA
+        script: |
+          cd ios/App
+          xcodebuild -exportArchive \
+            -archivePath build/App.xcarchive \
+            -exportOptionsPlist exportOptions.plist \
+            -exportPath build/ipa
+    artifacts:
+      - ios/App/build/ipa/*.ipa
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+        submit_to_app_store: false
     triggering:
       events:
         - push
