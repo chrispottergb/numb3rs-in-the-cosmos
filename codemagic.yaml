@@ -1,74 +1,30 @@
 workflows:
-  react-web-app:
-    name: React Web App
-    max_build_duration: 30
-    instance_type: mac_mini_m2
+  ios-workflow:
+    name: iOS Workflow
     environment:
-      node: 18
+      node: v20.11.0
+      xcode: latest
+      cocoapods: default
     scripts:
       - name: Install dependencies
-        script: npm ci
-      - name: Build
-        script: npm run build
-    artifacts:
-      - dist/**
-    triggering:
-      events:
-        - push
-      branch_patterns:
-        - pattern: main
-          include: true
-
-  ios-app:
-    name: iOS App Store Deploy
-    max_build_duration: 60
-    instance_type: mac_mini_m2
-    integrations:
-      app_store_connect: Numb3rs In The Cosmos
-    environment:
-      node: 18
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: app.lovable.25abfcf66b104783ba1bf16b1610a1ce
-      vars:
-        BUNDLE_ID: "app.lovable.25abfcf66b104783ba1bf16b1610a1ce"
-    scripts:
-      - name: Install dependencies
-        script: npm ci
-      - name: Build web assets
-        script: npm run build
-      - name: Install Capacitor dependencies
+        script: |
+          npm install
+      - name: Build web app
+        script: |
+          npm run build
+      - name: Capacitor sync
         script: |
           npx cap sync ios
-      - name: Set up code signing
+      - name: Build iOS
         script: |
           xcode-project use-profiles
-      - name: Build iOS app
-        script: |
-          cd ios/App
-          xcodebuild -workspace App.xcworkspace \
-            -scheme App \
-            -sdk iphoneos \
-            -configuration Release \
-            -archivePath build/App.xcarchive \
-            archive
-      - name: Export IPA
-        script: |
-          cd ios/App
-          xcodebuild -exportArchive \
-            -archivePath build/App.xcarchive \
-            -exportOptionsPlist exportOptions.plist \
-            -exportPath build/ipa
+          xcode-project build-ipa \
+            --workspace ios/App/App.xcworkspace \
+            --scheme App
     artifacts:
-      - ios/App/build/ipa/*.ipa
+      - build/ios/ipa/*.ipa
     publishing:
       app_store_connect:
-        auth: integration
-        submit_to_testflight: true
-        submit_to_app_store: false
-    triggering:
-      events:
-        - push
-      branch_patterns:
-        - pattern: main
-          include: true
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
