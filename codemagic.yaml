@@ -11,9 +11,9 @@ workflows:
       cocoapods: default
       ios_signing:
         distribution_type: app_store
-        bundle_identifier: com.highfrequencyholdings.spellbrkr
+        bundle_identifier: com.highfrequencyholdings.numb3rs
       vars:
-        BUNDLE_ID: "com.highfrequencyholdings.spellbrkr"
+        BUNDLE_ID: "com.highfrequencyholdings.numb3rs"
         XCODE_WORKSPACE: "ios/App/App.xcworkspace"
         XCODE_SCHEME: "App"
     scripts:
