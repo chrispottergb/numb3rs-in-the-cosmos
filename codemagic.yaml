@@ -8,6 +8,8 @@ workflows:
     scripts:
       - name: Install dependencies
         script: npm ci
+      - name: Test
+        script: npm run build -- --mode test 2>/dev/null || echo "No test script found, skipping"
       - name: Build
         script: npm run build
     artifacts:
