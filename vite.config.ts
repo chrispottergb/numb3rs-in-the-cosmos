@@ -8,6 +8,10 @@ import { VitePWA } from "vite-plugin-pwa";
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   return {
+  define: {
+    'import.meta.env.VITE_SUPABASE_URL': JSON.stringify(env.VITE_SUPABASE_URL || "https://ufhkjabnmvzoorzwyscm.supabase.co"),
+    'import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY': JSON.stringify(env.VITE_SUPABASE_PUBLISHABLE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVmaGtqYWJubXZ6b29yend5c2NtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYzMTU2OTgsImV4cCI6MjA4MTg5MTY5OH0.OUzSt4ejVBUesLRWEG_SGQkAKWCw8jF3AuQdHEi4zP0"),
+  },
   server: {
     host: "::",
     port: 8080,
