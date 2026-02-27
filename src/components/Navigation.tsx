@@ -13,7 +13,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 
 const navLinks = [
-  { name: "Resonance Room", href: "#resonance-room" },
+  { name: "Resonance Room", href: "/home", scrollTo: "resonance-room" },
 ];
 
 const Navigation = () => {
@@ -73,13 +73,18 @@ const Navigation = () => {
             </span>
           </Link>
           {navLinks.map((link) => (
-            <a
+            <button
               key={link.name}
-              href={link.href}
+              onClick={() => {
+                navigate(link.href);
+                setTimeout(() => {
+                  document.getElementById(link.scrollTo)?.scrollIntoView({ behavior: 'smooth' });
+                }, 100);
+              }}
               className="text-sm text-muted-foreground hover:text-primary transition-colors font-medium tracking-wide"
             >
               {link.name}
-            </a>
+            </button>
           ))}
 
           {/* Auth Section */}
@@ -208,12 +213,17 @@ const Navigation = () => {
 
               {navLinks.map((link) => (
                 <SheetClose asChild key={link.name}>
-                  <a
-                    href={link.href}
-                    className="text-lg text-muted-foreground hover:text-primary transition-colors font-medium tracking-wide py-2"
+                  <button
+                    onClick={() => {
+                      navigate(link.href);
+                      setTimeout(() => {
+                        document.getElementById(link.scrollTo)?.scrollIntoView({ behavior: 'smooth' });
+                      }, 100);
+                    }}
+                    className="text-lg text-muted-foreground hover:text-primary transition-colors font-medium tracking-wide py-2 text-left"
                   >
                     {link.name}
-                  </a>
+                  </button>
                 </SheetClose>
               ))}
 
