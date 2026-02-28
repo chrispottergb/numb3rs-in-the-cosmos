@@ -27,7 +27,7 @@ workflows:
         script: |
           rm -rf ios
           npx cap add ios
-          npx cap sync ios
+          npx cap copy ios
       - name: Install CocoaPods
         script: |
           cd ios/App
